@@ -9,6 +9,8 @@ from packaging import version
 
 VersionEntry = TypedDict("VersionEntry", {"version": str, "changes": list[str]})
 
+BULLET_RE = re.compile(r"^-")
+
 
 def _parse_version(content: str) -> semver.Version | version.Version | None:
     content = content.lstrip("v")
@@ -55,7 +57,7 @@ def load(path_file: str) -> list[VersionEntry]:
                 changelog.append(current)
                 continue
 
-            if re.match(r"^-", line):
+            if BULLET_RE.match(line):
                 current["changes"].append(line.lstrip("-").strip())
                 continue
 
