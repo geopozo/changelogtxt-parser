@@ -1,0 +1,19 @@
+# Py Build Stuff
+*.pyc
+*.egg-info/
+__pycache__
+
+# Text Editor Stuff
+*.DS_Store
+*.kate-swp
+*.sw*
+
+# Local Environment
+.venv
+
+# Artifacts from Build
+src/js/build
+test-results*
+
+# avoid ignore .gitkeep
+node_modules/
