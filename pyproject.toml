@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=65.0.0", "wheel", "setuptools-git-versioning"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages]
+find = {namespaces = false, where = ["src"]}
+
+[project]
+name = "changelogtxt-parser"
+version = "0.1.0"
+description = "Parses changelog txt files"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Andrew Pikul", email = "ajpikul@gmail.com" },
+  { name = "David Angarita", email = "davidangarita.sistemas@gmail.com" }
+]
+dependencies = []
