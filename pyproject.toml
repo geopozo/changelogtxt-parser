@@ -16,4 +16,6 @@ authors = [
   { name = "Andrew Pikul", email = "ajpikul@gmail.com" },
   { name = "David Angarita", email = "davidangarita.sistemas@gmail.com" }
 ]
-dependencies = []
+dependencies = [
+    "semver>=3.0.4",
+]
