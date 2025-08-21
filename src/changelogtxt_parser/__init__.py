@@ -44,8 +44,9 @@ def load(path_file: str) -> list[VersionEntry]:
     with file.open("r", encoding="utf-8") as f:
         changelog: list[VersionEntry] = [{"version": "Unreleased", "changes": []}]
         current = changelog[-1]
+        need_bullet = False
 
-        for raw in f:
+        for line_no, raw in enumerate(f, start=1):
             line = raw.strip()
             if not line:
                 continue
@@ -53,7 +54,16 @@ def load(path_file: str) -> list[VersionEntry]:
             if _parse_version(line):
                 current: VersionEntry = {"version": line, "changes": []}
                 changelog.append(current)
+                need_bullet = True
                 continue
+
+            if need_bullet:
+                if not BULLET_RE.match(line):
+                    raise ValueError(
+                        f"Invalid changelog format at line {line_no}: "
+                        f'Expected a "-" bullet after version, got "{line}"'
+                    )
+                need_bullet = False
 
             if BULLET_RE.match(line):
                 current["changes"].append(line.lstrip("-").strip())
