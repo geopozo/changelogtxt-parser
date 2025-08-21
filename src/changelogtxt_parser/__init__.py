@@ -2,30 +2,13 @@ from __future__ import annotations
 
 import pathlib
 import re
+from .version import parse_version
 from typing import TypedDict
 
-import semver
-from packaging import version
 
 VersionEntry = TypedDict("VersionEntry", {"version": str, "changes": list[str]})
 
 BULLET_RE = re.compile(r"^-")
-
-
-def _parse_version(content: str) -> semver.Version | version.Version | None:
-    content = content.removeprefix("v")
-    v = None
-    try:
-        v = version.Version(content)
-    except version.InvalidVersion:
-        pass
-    try:
-        v = semver.Version.parse(content)
-    except ValueError:
-        pass
-    if not v:
-        return None
-    return v
 
 
 def _resolve_path(path_file: str, for_write: bool = False) -> pathlib.Path:
@@ -56,7 +39,7 @@ def load(path_file: str) -> list[VersionEntry]:
             if not line:
                 continue
 
-            if _parse_version(line):
+            if parse_version(line):
                 current: VersionEntry = {"version": line, "changes": []}
                 changelog.append(current)
                 need_bullet = True
