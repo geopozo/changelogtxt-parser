@@ -28,7 +28,7 @@ def _parse_version(content: str) -> semver.Version | version.Version | None:
     return v
 
 
-def _validate_path_file(path_file: str) -> pathlib.Path:
+def _resolve_path(path_file: str) -> pathlib.Path:
     path = pathlib.Path(path_file)
 
     if not path.is_absolute():
@@ -38,8 +38,17 @@ def _validate_path_file(path_file: str) -> pathlib.Path:
     return path
 
 
+def _resolve_output_path(path_file: str) -> pathlib.Path:
+    path = pathlib.Path(path_file)
+
+    if not path.is_absolute():
+        path = (pathlib.Path(__file__).parent / path).resolve()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
+
 def load(path_file: str) -> list[VersionEntry]:
-    file = _validate_path_file(path_file)
+    file = _resolve_path(path_file)
 
     with file.open("r", encoding="utf-8") as f:
         changelog: list[VersionEntry] = [{"version": "Unreleased", "changes": []}]
