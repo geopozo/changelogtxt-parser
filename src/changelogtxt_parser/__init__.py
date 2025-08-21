@@ -32,11 +32,9 @@ def _validate_path_file(path_file: str) -> pathlib.Path:
     path = pathlib.Path(path_file)
 
     if not path.is_absolute():
-        path = pathlib.Path(__file__).parent / path
-
+        path = (pathlib.Path(__file__).parent / path).resolve()
     if not path.exists():
         raise FileNotFoundError(f"File not found: {path}")
-
     return path
 
 
