@@ -17,5 +17,6 @@ authors = [
   { name = "David Angarita", email = "davidangarita.sistemas@gmail.com" }
 ]
 dependencies = [
+    "packaging>=25.0",
     "semver>=3.0.4",
 ]
