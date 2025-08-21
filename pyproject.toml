@@ -11,6 +11,7 @@ version = "0.1.0"
 description = "Parses changelog txt files"
 readme = "README.md"
 requires-python = ">=3.10"
+license.file = "LICENSE"
 authors = [
   { name = "Andrew Pikul", email = "ajpikul@gmail.com" },
   { name = "David Angarita", email = "davidangarita.sistemas@gmail.com" }
