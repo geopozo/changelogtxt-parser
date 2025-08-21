@@ -28,22 +28,18 @@ def _parse_version(content: str) -> semver.Version | version.Version | None:
     return v
 
 
-def _resolve_path(path_file: str) -> pathlib.Path:
+def _resolve_path(path_file: str, for_write: bool = False) -> pathlib.Path:
     path = pathlib.Path(path_file)
 
     if not path.is_absolute():
         path = (pathlib.Path(__file__).parent / path).resolve()
-    if not path.exists():
-        raise FileNotFoundError(f"File not found: {path}")
-    return path
 
+    if for_write:
+        path.parent.mkdir(parents=True, exist_ok=True)
+    else:
+        if not path.exists():
+            raise FileNotFoundError(f"File not found: {path}")
 
-def _resolve_output_path(path_file: str) -> pathlib.Path:
-    path = pathlib.Path(path_file)
-
-    if not path.is_absolute():
-        path = (pathlib.Path(__file__).parent / path).resolve()
-    path.parent.mkdir(parents=True, exist_ok=True)
     return path
 
 
