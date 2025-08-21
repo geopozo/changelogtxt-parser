@@ -81,3 +81,19 @@ def load(path_file: str) -> list[VersionEntry]:
                 current_list.append(line)
 
     return changelog
+
+
+def dump(entries: list[VersionEntry], path_file: str) -> None:
+    path = _resolve_path(path_file, True)
+
+    lines = []
+    for e in entries:
+        if e["version"] == "Unreleased" and not e["changes"]:
+            continue
+        header = [] if e["version"] == "Unreleased" else [e["version"]]
+        lines.append("\n".join(header + [f"- {c}" for c in e["changes"]]))
+
+    content = "\n\n".join(lines) + "\n"
+
+    with path.open("w", encoding="utf-8") as f:
+        f.write(content)
