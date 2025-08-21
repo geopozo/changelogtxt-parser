@@ -13,7 +13,7 @@ BULLET_RE = re.compile(r"^-")
 
 
 def _parse_version(content: str) -> semver.Version | version.Version | None:
-    content = content.lstrip("v")
+    content = content.removeprefix("v")
     v = None
     try:
         v = version.Version(content)
