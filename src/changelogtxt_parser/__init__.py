@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pathlib
 import re
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 from changelogtxt_parser.version import parse_version
 
@@ -13,11 +13,16 @@ VersionEntry = TypedDict("VersionEntry", {"version": str, "changes": list[str]})
 BULLET_RE = re.compile(r"^-")
 
 
-def _resolve_path(path_file: str, for_write: bool = False) -> pathlib.Path:
-    path = pathlib.Path(path_file)
+def _resolve_path(
+    path_file: str,
+    for_write: bool = False,
+    base_dir: Optional[pathlib.Path] = None,
+) -> pathlib.Path:
+    path = pathlib.Path(path_file).expanduser()
 
     if not path.is_absolute():
-        path = (pathlib.Path(__file__).parent / path).resolve()
+        base = base_dir if base_dir else pathlib.Path.cwd()
+        path = (base / path).resolve()
 
     if for_write:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -51,7 +56,7 @@ def load(path_file: str) -> list[VersionEntry]:
                 if not BULLET_RE.match(line):
                     raise ValueError(
                         f"Invalid changelog format at line {line_no}: "
-                        f'Expected a "-" bullet after version, got "{line}"'
+                        f'Expected a "-" bullet after version, got "{line}"',
                     )
                 need_bullet = False
 
