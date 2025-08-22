@@ -87,3 +87,5 @@ def dump(entries: list[VersionEntry], path_file: str) -> None:
 
     with path.open("w", encoding="utf-8") as f:
         f.write(content)
+
+    print(f"File generated at: {path}")
