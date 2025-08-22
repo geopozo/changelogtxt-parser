@@ -68,7 +68,7 @@ class BadVersion:
         return f"{self.major}.{self.minor}.{self.micro}{pre}{local}"
 
 
-_VersionTypes = semver.Version | pyversion.Version | BadVersion
+_VersionTypes = semver.Version | pyversion.Version | BadVersion | None
 
 
 def parse_version(content: str) -> _VersionTypes | None:
