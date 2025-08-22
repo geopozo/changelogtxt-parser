@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import os
 import pathlib
 import re
-from typing import Optional, TypedDict
+from typing import Literal, Optional, TypedDict
 
 from changelogtxt_parser.version import parse_version
 
@@ -89,3 +90,37 @@ def dump(entries: list[VersionEntry], path_file: str) -> None:
         f.write(content)
 
     print(f"File generated at: {path}")
+
+
+def find_changelogtxt_file(base_path="./") -> str | None:
+    filename = "CHANGELOG.txt"
+    for root, _, files in os.walk(base_path):
+        if filename in files:
+            return os.path.join(root, filename)
+    raise FileNotFoundError(f"{filename} file not found in the specified path.")
+
+
+def update_version(
+    version: str | Literal["Unreleased"] | None,
+    message: str,
+    base_path: str = "./",
+) -> None:
+    if not version:
+        version = "Unreleased"
+
+    if not message:
+        raise ValueError("Message must not be empty.")
+
+    path_file = find_changelogtxt_file(base_path)
+    if not path_file:
+        return
+
+    logs = load(path_file)
+    for log in logs:
+        if log["version"] == version:
+            log["changes"].append(message)
+            break
+        else:
+            logs.insert(1, {"version": version, "changes": [message]})
+
+    dump(logs, path_file)
