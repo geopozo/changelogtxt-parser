@@ -1,10 +1,12 @@
+# SPDX-License-Identifier: MIT
+
 from __future__ import annotations
 
 import pathlib
 import re
-from .version import parse_version
 from typing import TypedDict
 
+from changelogtxt_parser.version import parse_version
 
 VersionEntry = TypedDict("VersionEntry", {"version": str, "changes": list[str]})
 
@@ -76,7 +78,7 @@ def dump(entries: list[VersionEntry], path_file: str) -> None:
         header = [] if e["version"] == "Unreleased" else [e["version"]]
         lines.append("\n".join(header + [f"- {c}" for c in e["changes"]]))
 
-    content = "\n\n".join(lines) + "\n"
+    content: str = "\n\n".join(lines) + "\n"
 
     with path.open("w", encoding="utf-8") as f:
         f.write(content)
