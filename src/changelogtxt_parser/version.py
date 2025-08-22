@@ -20,7 +20,7 @@ class BadVersion:
     local: str | None = None
     is_prerelease: bool = False
 
-    def __init__(self, tag: str):
+    def __init__(self, tag: str) -> None:
         """Look for tag-like structures that parsers won't return."""
         object.__setattr__(self, "tag", tag)
         object.__setattr__(self, "major", 0)
@@ -57,11 +57,11 @@ class BadVersion:
         object.__setattr__(self, "micro", int(micro_match.group(1)))
         object.__setattr__(self, "local", micro_match.group(2) or None)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Print Version as string."""
         return self.__repr__()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Print Version as python-compatible string if possible."""
         pre = f"{self.pre[0]}{self.pre[1]}" if self.pre is not None else ""
         local = f"+{self.local}" if self.local is not None else ""
