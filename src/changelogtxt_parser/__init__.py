@@ -40,7 +40,7 @@ def load(path_file: str) -> list[VersionEntry]:
 
     with file.open("r", encoding="utf-8") as f:
         changelog: list[VersionEntry] = [{"version": DEFAULT_VER, "changes": []}]
-        current = changelog[-1]
+        current: VersionEntry = changelog[-1]
         need_bullet = False
 
         for line_no, raw in enumerate(f, start=1):
@@ -49,7 +49,7 @@ def load(path_file: str) -> list[VersionEntry]:
                 continue
 
             if parse_version(line):
-                current: VersionEntry = {"version": line, "changes": []}
+                current = {"version": line, "changes": []}
                 changelog.append(current)
                 need_bullet = True
                 continue
