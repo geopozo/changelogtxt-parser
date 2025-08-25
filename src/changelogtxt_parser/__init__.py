@@ -93,7 +93,7 @@ def dump(entries: list[VersionEntry], path_file: str) -> None:
     print(f"File generated at: {path}")
 
 
-def find_changelogtxt_file(base_path="./") -> str | None:
+def find_changelogtxt_file(base_path: str = "./") -> str | None:
     if pathlib.Path(base_path).is_file():
         return base_path
     if pathlib.Path(base_path).exists():
