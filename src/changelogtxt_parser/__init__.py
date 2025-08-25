@@ -112,15 +112,13 @@ def update_version(
         raise ValueError("Message must not be empty.")
 
     path_file = find_changelogtxt_file(base_path)
-    if not path_file:
-        return
+    if path_file:
+        logs = load(path_file)
+        for log in logs:
+            if log["version"] == version:
+                log["changes"].append(message)
+                break
+            else:
+                logs.insert(1, {"version": version, "changes": [message]})
 
-    logs = load(path_file)
-    for log in logs:
-        if log["version"] == version:
-            log["changes"].append(message)
-            break
-        else:
-            logs.insert(1, {"version": version, "changes": [message]})
-
-    dump(logs, path_file)
+        dump(logs, path_file)
