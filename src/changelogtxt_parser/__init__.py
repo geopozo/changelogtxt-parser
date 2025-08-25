@@ -5,13 +5,14 @@ from __future__ import annotations
 import os
 import pathlib
 import re
-from typing import Literal, Optional, TypedDict
+from typing import Optional, TypedDict
 
 from changelogtxt_parser.version import parse_version
 
 VersionEntry = TypedDict("VersionEntry", {"version": str, "changes": list[str]})
 
 BULLET_RE = re.compile(r"^-")
+DEFAULT_VER = "Unreleased"
 
 
 def _resolve_path(
@@ -38,7 +39,7 @@ def load(path_file: str) -> list[VersionEntry]:
     file = _resolve_path(path_file)
 
     with file.open("r", encoding="utf-8") as f:
-        changelog: list[VersionEntry] = [{"version": "Unreleased", "changes": []}]
+        changelog: list[VersionEntry] = [{"version": DEFAULT_VER, "changes": []}]
         current = changelog[-1]
         need_bullet = False
 
@@ -79,9 +80,9 @@ def dump(entries: list[VersionEntry], path_file: str) -> None:
 
     lines = []
     for e in entries:
-        if e["version"] == "Unreleased" and not e["changes"]:
+        if e["version"] == DEFAULT_VER and not e["changes"]:
             continue
-        header = [] if e["version"] == "Unreleased" else [e["version"]]
+        header = [] if e["version"] == DEFAULT_VER else [e["version"]]
         lines.append("\n".join(header + [f"- {c}" for c in e["changes"]]))
 
     content: str = "\n\n".join(lines) + "\n"
@@ -101,12 +102,12 @@ def find_changelogtxt_file(base_path="./") -> str | None:
 
 
 def update_version(
-    version: str | Literal["Unreleased"] | None,
+    version: str | None,
     message: str,
     base_path: str = "./",
 ) -> None:
     if not version:
-        version = "Unreleased"
+        version = DEFAULT_VER
 
     if not version.startswith("v"):
         version = f"v{version}"
