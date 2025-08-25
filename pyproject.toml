@@ -20,3 +20,8 @@ dependencies = [
     "packaging>=25.0",
     "semver>=3.0.4",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+]
