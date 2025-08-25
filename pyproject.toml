@@ -23,6 +23,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mypy>=1.17.1",
     "pytest>=8.4.1",
     "pytest-xdist>=3.8.0",
 ]
+
+[tool.mypy]
+files = ["src/changelogtxt_parser"]
