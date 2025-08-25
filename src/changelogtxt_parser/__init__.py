@@ -108,6 +108,9 @@ def update_version(
     if not version:
         version = "Unreleased"
 
+    if not version.startswith("v"):
+        version = f"v{version}"
+
     if not message:
         raise ValueError("Message must not be empty.")
 
