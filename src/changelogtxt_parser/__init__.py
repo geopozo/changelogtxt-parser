@@ -94,10 +94,13 @@ def dump(entries: list[VersionEntry], path_file: str) -> None:
 
 
 def find_changelogtxt_file(base_path="./") -> str | None:
-    filename = "CHANGELOG.txt"
-    for root, _, files in os.walk(base_path):
-        if filename in files:
-            return os.path.join(root, filename)
+    if pathlib.Path(base_path).is_file():
+        return base_path
+    if pathlib.Path(base_path).exists():
+        filename = "CHANGELOG.txt"
+        for root, _, files in os.walk(base_path):
+            if filename in files:
+                return os.path.join(root, filename)
     raise FileNotFoundError(f"{filename} file not found in the specified path.")
 
 
