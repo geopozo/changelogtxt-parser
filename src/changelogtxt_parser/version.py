@@ -73,9 +73,9 @@ class BadVersion:
 _VersionTypes = semver.Version | pyversion.Version | BadVersion | None
 
 
-def parse_version(content: str) -> _VersionTypes | None:
+def parse_version(content: str) -> _VersionTypes:
     content = content.removeprefix("v")
-    v = None
+    v: _VersionTypes = None
     try:
         v = pyversion.Version(content)
     except pyversion.InvalidVersion:
