@@ -108,7 +108,7 @@ def update_version(
     version: str | None,
     message: str,
     base_path: str = "./",
-) -> None:
+) -> bool:
     if not version:
         version = DEFAULT_VER
 
@@ -129,3 +129,5 @@ def update_version(
                 logs.insert(1, {"version": version, "changes": [message]})
 
         dump(logs, path_file)
+        return True
+    return False
