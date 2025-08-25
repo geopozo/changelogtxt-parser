@@ -129,5 +129,6 @@ def update_version(
                 logs.insert(1, {"version": version, "changes": [message]})
 
         dump(logs, path_file)
+        # If you want to know if the changelog was successful.
         return True
     return False
