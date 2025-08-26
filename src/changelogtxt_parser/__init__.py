@@ -132,3 +132,7 @@ def update_version(
         # If you want to know if the changelog was successful.
         return True
     return False
+
+
+def run_cli():
+    print("This is a CLI test")
