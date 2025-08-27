@@ -16,6 +16,13 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         conflict_handler="resolve",
         description=description,
     )
+    parser.add_argument(
+        "-f",
+        "--file",
+        help="Optional file path.",
+        required=False,
+        default="./",
+    )
 
     subparsers = parser.add_subparsers(dest="command")
 
@@ -31,17 +38,10 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         required=True,
     )
 
-    check_format = subparsers.add_parser(
+    _ = subparsers.add_parser(
         "check-format",
         description="Verify that changelog file has the correct format",
         help="Check changelog format.",
-    )
-    check_format.add_argument(
-        "-f",
-        "--file",
-        help="Optional file path to check format.",
-        required=False,
-        default="./",
     )
 
     basic_args = parser.parse_args()
@@ -55,7 +55,7 @@ def run_cli() -> None:
     command = cli_args.pop("command", None)
     match command:
         case "check-tag":
-            res = changelog.check_tag(tag)
+            res = changelog.check_tag(tag, file)
             sys.exit(int(not res))
         case "check-format":
             if not (path_file := changelog.find_changelogtxt_file(file)):
