@@ -8,7 +8,7 @@ import changelogtxt_parser as changelog
 def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
     description = """changelogtxt helps you manage your changelog file.
 
-    See changelogtxt COMMAND --help for information about commands.
+    changelogtxt COMMAND --help for information about commands.
     """
 
     parser = argparse.ArgumentParser(
@@ -38,7 +38,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         required=True,
     )
 
-    _ = subparsers.add_parser(
+    subparsers.add_parser(
         "check-format",
         description="Verify that changelog file has the correct format",
         help="Check changelog format.",
