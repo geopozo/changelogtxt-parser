@@ -144,9 +144,7 @@ def check_tag(tag: str, base_path: str = "./") -> bool:
                 print(f"Tag validation for '{tag}' was successful.")
                 return True
     print(
-        f"""Tag '{tag}' not found in changelog.
-        Please update the changelog file before pushing the tag.
-        """,
+        f"Tag '{tag}' not found in changelog.",
         file=sys.stderr,
     )
     return False
