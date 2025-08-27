@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import pathlib
 import re
+import sys
 from typing import Optional, TypedDict
 
 from changelogtxt_parser.version import parse_version
@@ -131,4 +132,20 @@ def update_version(
         dump(logs, path_file)
         # If you want to know if the changelog was successful.
         return True
+    return False
+
+
+def check_tag(tag: str, base_path: str = "./") -> bool:
+    file_path = find_changelogtxt_file(base_path)
+    if file_path:
+        logs = load(file_path)
+        for log in logs:
+            if log["version"] == tag:
+                print(f"Tag validation for '{tag}' was successful.")
+                return True
+    print(
+        f"""Tag '{tag}' not found in changelog.
+            Please update the changelog file before pushing the tag.""",
+        file=sys.stderr,
+    )
     return False
