@@ -21,6 +21,9 @@ dependencies = [
     "semver>=3.0.4",
 ]
 
+[project.scripts]
+changelogtxt = "changelogtxt_parser._cli:run_cli"
+
 [dependency-groups]
 dev = [
     "mypy>=1.17.1",
