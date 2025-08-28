@@ -45,6 +45,7 @@ def load(path_file: str) -> list[VersionEntry]:
         changelog: list[VersionEntry] = [{"version": DEFAULT_VER, "changes": []}]
         current: VersionEntry = changelog[-1]
         need_bullet = False
+        last_v_line_no = None
 
         for line_no, raw in enumerate(f, start=1):
             line = raw.strip()
@@ -53,7 +54,7 @@ def load(path_file: str) -> list[VersionEntry]:
 
             if need_bullet and not BULLET_RE.match(line):
                 raise ValueError(
-                    f"Invalid changelog format at line {line_no}: "
+                    f"Invalid changelog format at line {last_v_line_no or line_no}: "
                     f"Expected a '-' bullet after version declared",
                 )
 
@@ -61,6 +62,7 @@ def load(path_file: str) -> list[VersionEntry]:
                 current = {"version": line, "changes": []}
                 changelog.append(current)
                 need_bullet = True
+                last_v_line_no = line_no
                 continue
 
             if BULLET_RE.match(line):
