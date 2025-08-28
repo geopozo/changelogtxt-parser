@@ -54,8 +54,8 @@ def load(path_file: str) -> list[VersionEntry]:
 
             if need_bullet and not BULLET_RE.match(line):
                 raise ValueError(
-                    f"Invalid changelog format at line {last_v_line_no or line_no}: "
-                    f"Expected a '-' bullet after version declared",
+                    f"Invalid changelog format at line {line_no}: "
+                    f"Expected a '-' bullet after version declared at line {last_v_line_no}",
                 )
 
             if parse_version(line):
