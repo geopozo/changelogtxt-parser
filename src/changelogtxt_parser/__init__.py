@@ -66,7 +66,13 @@ def load(path_file: str) -> list[VersionEntry]:
                 need_bullet = False
 
             if BULLET_RE.match(line):
-                current["changes"].append(line.lstrip("-").strip())
+                change = line.lstrip("-").strip()
+                if not change:
+                    raise ValueError(
+                        f"Invalid changelog format at line {line_no}: "
+                        f'Expected content after "-"',
+                    )
+                current["changes"].append(change)
                 continue
 
             current_list = current["changes"]
