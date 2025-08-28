@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import pathlib
 import re
@@ -14,6 +15,7 @@ VersionEntry = TypedDict("VersionEntry", {"version": str, "changes": list[str]})
 
 BULLET_RE = re.compile(r"^-")
 DEFAULT_VER = "Unreleased"
+logging.basicConfig(level=logging.DEBUG)
 
 
 def _resolve_path(
