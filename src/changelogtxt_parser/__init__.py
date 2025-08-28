@@ -15,7 +15,7 @@ VersionEntry = TypedDict("VersionEntry", {"version": str, "changes": list[str]})
 
 BULLET_RE = re.compile(r"^-")
 DEFAULT_VER = "Unreleased"
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
 
 def _resolve_path(
@@ -93,7 +93,7 @@ def dump(entries: list[VersionEntry], path_file: str) -> None:
     with path.open("w", encoding="utf-8") as f:
         f.write(content)
 
-    print(f"File generated at: {path}")
+    logging.info(f"File generated at: {path}")
 
 
 def find_changelogtxt_file(base_path: str = "./") -> str | None:
@@ -132,7 +132,6 @@ def update_version(
                 logs.insert(1, {"version": version, "changes": [message]})
 
         dump(logs, path_file)
-        # If you want to know if the changelog was successful.
         return True
     return False
 
@@ -143,7 +142,7 @@ def check_tag(tag: str, base_path: str = "./") -> bool:
         logs = load(file_path)
         for log in logs:
             if log["version"] == tag:
-                print(f"Tag validation for '{tag}' was successful.")
+                logging.info(f"Tag validation for '{tag}' was successful.")
                 return True
     print(
         f"Tag '{tag}' not found in changelog.",
