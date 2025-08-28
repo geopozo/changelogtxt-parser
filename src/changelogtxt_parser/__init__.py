@@ -179,4 +179,6 @@ def compare_files(source_file: str, target_file: str) -> bool:
     if src_changes != trg_changes:
         logging.info("New Unreleased point")
         return True
+
+    logging.info("No changes")
     return False
