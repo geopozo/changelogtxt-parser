@@ -154,3 +154,27 @@ def check_tag(tag: str, base_path: str = "./") -> bool:
         file=sys.stderr,
     )
     return False
+
+
+def _changes_count(logs, version):
+    for log in logs:
+        if log["version"] == version:
+            return len(log["changes"])
+    return 0
+
+
+def compare_files(source_file: str, target_file: str) -> bool:
+    src_file = load(source_file)
+    trg_file = load(target_file)
+
+    if len(src_file) != len(trg_file):
+        logging.info("New version")
+        return True
+
+    src_changes = _changes_count(src_file, DEFAULT_VER)
+    trg_changes = _changes_count(trg_file, DEFAULT_VER)
+
+    if src_changes != trg_changes:
+        logging.info("New Unreleased point")
+        return True
+    return False
