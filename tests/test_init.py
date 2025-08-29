@@ -115,3 +115,19 @@ class TestUpdateVersion:
 
         updated_content = changelog.load(str(changelog_file))
         assert_json_roundtrip(updated_content)
+
+
+class TestCheckTag:
+    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @given(st.lists(version_entry_strategy, min_size=1, max_size=5))
+    def test_check_tag(self, tmp_path, entries):
+        changelog_file = tmp_path / DEFAULT_FILE
+        changelog.dump(entries, str(changelog_file))
+
+        for entry in entries:
+            if entry["version"] != "Unreleased":
+                result = changelog.check_tag(entry["version"], str(tmp_path))
+                assert result
+
+        result = changelog.check_tag("nonexistent-tag", str(tmp_path))
+        assert not result
