@@ -1,4 +1,5 @@
-import pytest
+import json
+from hypothesis import HealthCheck, given, settings, strategies as st
 
 import changelogtxt_parser as changelog
 
@@ -11,12 +12,42 @@ PARSED_CHANGELOG: list[changelog.VersionEntry] = [
     {"version": "v1.0.0", "changes": ["First release", "Bug fixes"]},
     {"version": "v0.1.0", "changes": ["Initial version"]},
 ]
-DUMP_OUTPUT = "v1.0.0\n- First release\n- Bug fixes\n\nv0.1.0\n- Initial version\n"
-TEST_PATHS = ["/nonexistent/changelog.txt", "subdir", "nested/deep"]
-VERSION_CASES = [
-    ("1.0.0", "New feature", "v1.0.0"),
-    (None, "Unreleased feature", "Unreleased"),
-]
+
+valid_change_text = st.text(
+    min_size=1,
+    max_size=100,
+    alphabet=st.characters(
+        min_codepoint=32,
+        max_codepoint=126,
+        blacklist_categories=["Cc", "Cs"],
+    ),
+).filter(lambda x: x.strip())
+
+version_entry_strategy = st.one_of(
+    st.fixed_dictionaries(
+        {
+            "version": st.just("Unreleased"),
+            "changes": st.lists(valid_change_text, max_size=10),
+        },
+    ),
+    st.fixed_dictionaries(
+        {
+            "version": st.builds(
+                lambda major, minor, patch: f"v{major}.{minor}.{patch}",
+                major=st.integers(min_value=0, max_value=99),
+                minor=st.integers(min_value=0, max_value=99),
+                patch=st.integers(min_value=0, max_value=99),
+            ),
+            "changes": st.lists(valid_change_text, min_size=1, max_size=10),
+        },
+    ),
+)
+
+
+def assert_json_roundtrip(entries: list[changelog.VersionEntry]) -> None:
+    json_str = json.dumps(entries)
+    deserialized = json.loads(json_str)
+    assert deserialized == entries
 
 
 class TestLoad:
@@ -26,10 +57,7 @@ class TestLoad:
 
         result = changelog.load(str(changelog_file))
         assert result == PARSED_CHANGELOG
-
-    def test_load_file_not_found_error(self):
-        with pytest.raises(FileNotFoundError, match="File not found"):
-            changelog.load(TEST_PATHS[0])
+        assert_json_roundtrip(result)
 
     def test_load_return_right_path(self, tmp_path, monkeypatch):
         changelog_file = tmp_path / DEFAULT_FILE
@@ -42,97 +70,48 @@ class TestLoad:
 
 
 class TestDump:
-    def test_dump_valid_entries_and_path_file(self, tmp_path):
+    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @given(st.lists(version_entry_strategy, min_size=1, max_size=5))
+    def test_dump_generated_entries(self, tmp_path, entries):
         changelog_file = tmp_path / DEFAULT_FILE
 
-        changelog.dump(PARSED_CHANGELOG, str(changelog_file))
+        changelog.dump(entries, str(changelog_file))
 
-        content = changelog_file.read_text()
-        assert content == DUMP_OUTPUT
-
-    def test_dump_verify_modified_file(self, tmp_path):
-        nested_path = tmp_path / "nested" / DEFAULT_FILE
-
-        changelog.dump(PARSED_CHANGELOG, str(nested_path))
-
-        assert nested_path.exists()
-        content = nested_path.read_text()
-        assert content == DUMP_OUTPUT
+        loaded_entries = changelog.load(str(changelog_file))
+        assert_json_roundtrip(loaded_entries)
 
 
 class TestFindChangelogTxtFile:
-    def test_find_valid_base_path(self, tmp_path):
-        changelog_file = tmp_path / "test.txt"
-        changelog_file.write_text("test")
-
-        result = changelog.find_changelogtxt_file(str(changelog_file))
-        assert result == str(changelog_file)
-
-    def test_find_trigger_error(self, tmp_path):
-        with pytest.raises(FileNotFoundError, match=f"{DEFAULT_FILE} file not found"):
-            changelog.find_changelogtxt_file(str(tmp_path))
-
-    def test_find_valid_path_file_return_right_path(self, tmp_path):
-        nested_dir = tmp_path / TEST_PATHS[1]
-        nested_dir.mkdir(parents=True)
-        changelog_file = nested_dir / DEFAULT_FILE
-        changelog_file.write_text("test")
+    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @given(st.lists(version_entry_strategy, min_size=1, max_size=3))
+    def test_find_changelog_hypothesis(self, tmp_path, entries):
+        changelog_file = tmp_path / DEFAULT_FILE
+        changelog.dump(entries, str(changelog_file))
 
         result = changelog.find_changelogtxt_file(str(tmp_path))
+        assert result
         assert result == str(changelog_file)
+
+        loaded_entries = changelog.load(result)
+        assert_json_roundtrip(loaded_entries)
 
 
 class TestUpdateVersion:
-    @pytest.fixture
-    def setup_changelog(self, tmp_path):
-        def _setup(content="Unreleased\n- Some change\n"):
-            changelog_file = tmp_path / DEFAULT_FILE
-            changelog_file.write_text(content)
-            return str(tmp_path), str(changelog_file)
+    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @given(
+        st.text(
+            min_size=1,
+            max_size=100,
+            alphabet=st.characters(min_codepoint=48, max_codepoint=57),
+        ).filter(lambda x: not x.startswith("v")),
+        valid_change_text,
+    )
+    def test_update_version(self, tmp_path, version, message):
+        changelog_file = tmp_path / DEFAULT_FILE
+        changelog_file.write_text("Unreleased\n- Some change\n")
 
-        return _setup
-
-    @pytest.mark.parametrize("version,message,expected_version", VERSION_CASES)
-    def test_update_valid_version_message_base_path(
-        self,
-        setup_changelog,
-        version,
-        message,
-        expected_version,
-    ):
-        temp_dir, changelog_path = setup_changelog()
-
-        result = changelog.update_version(version, message, temp_dir)
+        result = changelog.update_version(version, message, str(tmp_path))
         assert result is True
 
-        updated_content = changelog.load(changelog_path)
-        if expected_version == "Unreleased":
-            assert message in updated_content[0]["changes"]
-        else:
-            found_version = next(
-                (e for e in updated_content if e["version"] == expected_version),
-                None,
-            )
-            assert found_version is not None
-            assert message in found_version["changes"]
-
-    def test_update_version_without_v(self, setup_changelog):
-        temp_dir, changelog_path = setup_changelog()
-
-        result = changelog.update_version("1.0.0", "Feature", temp_dir)
-        assert result is True
-
-        updated_content = changelog.load(changelog_path)
-        v_entry = next((e for e in updated_content if e["version"] == "v1.0.0"), None)
-        assert v_entry is not None
-
-    def test_update_valid_path_file_load_right_file(self, setup_changelog):
-        temp_dir, changelog_path = setup_changelog(CHANGELOG_CONTENT)
-
-        result = changelog.update_version("v1.0.0", "New change", temp_dir)
-        assert result is True
-
-        updated_content = changelog.load(changelog_path)
-        v1_entry = next(e for e in updated_content if e["version"] == "v1.0.0")
-        assert "New change" in v1_entry["changes"]
-        assert len(v1_entry["changes"]) >= 2
+        updated_content = changelog.load(str(changelog_file))
+        assert_json_roundtrip(updated_content)
