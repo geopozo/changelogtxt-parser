@@ -26,6 +26,7 @@ changelogtxt = "changelogtxt_parser._cli:run_cli"
 
 [dependency-groups]
 dev = [
+    "hypothesis>=6.138.7",
     "mypy>=1.17.1",
     "pytest>=8.4.1",
     "pytest-xdist>=3.8.0",
