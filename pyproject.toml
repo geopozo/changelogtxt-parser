@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.scripts]
-changelog = "changelogtxt_parser:run_cli"
+changelogtxt = "changelogtxt_parser._cli:run_cli"
 
 [dependency-groups]
 dev = [

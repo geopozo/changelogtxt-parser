@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import pathlib
 import re
+import sys
 from typing import Optional, TypedDict
 
 from changelogtxt_parser.version import parse_version
@@ -13,6 +15,7 @@ VersionEntry = TypedDict("VersionEntry", {"version": str, "changes": list[str]})
 
 BULLET_RE = re.compile(r"^-")
 DEFAULT_VER = "Unreleased"
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
 
 def _resolve_path(
@@ -42,28 +45,35 @@ def load(path_file: str) -> list[VersionEntry]:
         changelog: list[VersionEntry] = [{"version": DEFAULT_VER, "changes": []}]
         current: VersionEntry = changelog[-1]
         need_bullet = False
+        last_v_line_no = None
 
         for line_no, raw in enumerate(f, start=1):
             line = raw.strip()
             if not line:
                 continue
 
+            if need_bullet and not BULLET_RE.match(line):
+                raise ValueError(
+                    f"Invalid changelog format at line {line_no}: "
+                    f"Expected a '-' bullet after version declared at line {last_v_line_no}",
+                )
+
             if parse_version(line):
                 current = {"version": line, "changes": []}
                 changelog.append(current)
                 need_bullet = True
+                last_v_line_no = line_no
                 continue
 
-            if need_bullet:
-                if not BULLET_RE.match(line):
+            if BULLET_RE.match(line):
+                need_bullet = False
+                change = line.lstrip("-").strip()
+                if not change:
                     raise ValueError(
                         f"Invalid changelog format at line {line_no}: "
-                        f'Expected a "-" bullet after version, got "{line}"',
+                        f'Expected content after "-"',
                     )
-                need_bullet = False
-
-            if BULLET_RE.match(line):
-                current["changes"].append(line.lstrip("-").strip())
+                current["changes"].append(change)
                 continue
 
             current_list = current["changes"]
@@ -90,7 +100,7 @@ def dump(entries: list[VersionEntry], path_file: str) -> None:
     with path.open("w", encoding="utf-8") as f:
         f.write(content)
 
-    print(f"File generated at: {path}")
+    logging.info(f"File generated at: {path}")
 
 
 def find_changelogtxt_file(base_path: str = "./") -> str | None:
@@ -129,10 +139,46 @@ def update_version(
                 logs.insert(1, {"version": version, "changes": [message]})
 
         dump(logs, path_file)
-        # If you want to know if the changelog was successful.
         return True
     return False
 
 
-def run_cli():
-    print("This is a CLI test")
+def check_tag(tag: str, base_path: str = "./") -> bool:
+    file_path = find_changelogtxt_file(base_path)
+    if file_path:
+        logs = load(file_path)
+        for log in logs:
+            if log["version"] == tag:
+                logging.info(f"Tag validation for '{tag}' was successful.")
+                return True
+    print(
+        f"Tag '{tag}' not found in changelog.",
+        file=sys.stderr,
+    )
+    return False
+
+
+def _changes_count(logs, version):
+    for log in logs:
+        if log["version"] == version:
+            return len(log["changes"])
+    return 0
+
+
+def compare_files(source_file: str, target_file: str) -> bool:
+    src_file = load(source_file)
+    trg_file = load(target_file)
+
+    if len(src_file) != len(trg_file):
+        logging.info("New version")
+        return True
+
+    src_changes = _changes_count(src_file, DEFAULT_VER)
+    trg_changes = _changes_count(trg_file, DEFAULT_VER)
+
+    if src_changes != trg_changes:
+        logging.info("New Unreleased point")
+        return True
+
+    logging.info("No changes")
+    return False
