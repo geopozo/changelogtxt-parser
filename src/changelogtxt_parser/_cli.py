@@ -72,17 +72,17 @@ def run_cli() -> None:
 
     match command:
         case "check-tag":
-            res = changelog.check_tag(tag, file)
-            sys.exit(int(not res))
+            _res = changelog.check_tag(tag, file)
+            sys.exit(int(not _res))
         case "check-format":
             if not (path_file := changelog.find_changelogtxt_file(file)):
                 sys.exit(1)
             print(f"File found in: {path_file}")
-            res = changelog.load(path_file)
-            sys.exit(int(not res))
+            _logs = changelog.load(path_file)
+            sys.exit(int(not _logs))
         case "compare":
-            res = changelog.compare_files(source_file, target_file)
-            sys.exit(int(not res))
+            _res = changelog.compare_files(source_file, target_file)
+            sys.exit(int(not _res))
         case _:
             print("No command supplied.", file=sys.stderr)
             parser.print_help()

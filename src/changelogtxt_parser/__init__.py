@@ -158,7 +158,7 @@ def check_tag(tag: str, base_path: str = "./") -> bool:
     return False
 
 
-def _changes_count(logs, version):
+def _changes_count(logs: list[VersionEntry], version: str) -> int:
     for log in logs:
         if log["version"] == version:
             return len(log["changes"])
