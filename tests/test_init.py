@@ -131,3 +131,25 @@ class TestCheckTag:
 
         result = changelog.check_tag("nonexistent-tag", str(tmp_path))
         assert not result
+
+
+class TestCompareFiles:
+    @settings(suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @given(
+        st.lists(version_entry_strategy, min_size=1, max_size=3),
+        st.lists(version_entry_strategy, min_size=1, max_size=3),
+    )
+    def test_compare_files(self, tmp_path, source_entries, target_entries):
+        source_file = tmp_path / "source.txt"
+        target_file = tmp_path / "target.txt"
+
+        changelog.dump(source_entries, str(source_file))
+        changelog.dump(target_entries, str(target_file))
+
+        result = changelog.compare_files(str(source_file), str(target_file))
+        assert isinstance(result, bool)
+
+        loaded_source = changelog.load(str(source_file))
+        loaded_target = changelog.load(str(target_file))
+        assert_json_roundtrip(loaded_source)
+        assert_json_roundtrip(loaded_target)
