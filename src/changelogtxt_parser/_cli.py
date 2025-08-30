@@ -75,12 +75,14 @@ def run_cli() -> None:
             res = changelog.check_tag(tag, file)
             sys.exit(int(not res))
         case "check-format":
+            # a veces haces esto en la función, pero acá, acá
             if not (path_file := changelog.find_changelogtxt_file(file)):
                 sys.exit(1)
             print(f"File found in: {path_file}")
             res = changelog.load(path_file)
             sys.exit(int(not res))
         case "compare":
+            # tal vez si, bueno, encontrar el cambio y devolverlo/imprimirlo
             res = changelog.compare_files(source_file, target_file)
             sys.exit(int(not res))
         case _:

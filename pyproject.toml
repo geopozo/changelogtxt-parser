@@ -13,7 +13,6 @@ readme = "README.md"
 requires-python = ">=3.10"
 license.file = "LICENSE"
 authors = [
-  { name = "Andrew Pikul", email = "ajpikul@gmail.com" },
   { name = "David Angarita", email = "davidangarita.sistemas@gmail.com" }
 ]
 dependencies = [
@@ -33,3 +32,5 @@ dev = [
 
 [tool.mypy]
 files = ["src/changelogtxt_parser"]
+
+# este no tiene las configuraciones estandares, especialmente para ruff...
