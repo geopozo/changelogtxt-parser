@@ -2,8 +2,7 @@ import argparse
 import sys
 from typing import Any
 
-import changelogtxt_parser as changelog
-from changelogtxt_parser import _utils
+from changelogtxt_parser import _utils, app, serdes
 
 
 def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
@@ -80,11 +79,11 @@ def run_cli() -> None:
 
     match command:
         case "check-tag":
-            res = changelog.check_tag(tag, file)
+            res = app.check_tag(tag, file)
         case "check-format":
-            res, _ = changelog.load(file)
+            res, _ = serdes.load(file)
         case "compare":
-            res = changelog.compare_files(source_file, target_file)
+            res = app.compare_files(source_file, target_file)
             res = res or "No changes"
         case _:
             res = "No command supplied."
