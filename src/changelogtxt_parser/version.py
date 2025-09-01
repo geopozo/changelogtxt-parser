@@ -10,6 +10,13 @@ import semver
 from packaging import version as pyversion
 
 
+class VersionEntry(TypedDict):
+    """Changelog entry with a version identifier and a list of changes."""
+
+    version: str
+    changes: list[str]
+
+
 # Class taken from:
 # https://github.com/geopozo/github-helper/blob/andrew/more_versions/src/github_helper/api/versions.py
 @dataclass(frozen=True, slots=True)
@@ -95,10 +102,3 @@ def parse_version(content: str) -> _VersionTypes:
     if not v:
         return None
     return v
-
-
-class VersionEntry(TypedDict):
-    """Changelog entry with a version identifier and a list of changes."""
-
-    version: str
-    changes: list[str]
