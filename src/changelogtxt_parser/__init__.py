@@ -1,27 +1,21 @@
 # SPDX-License-Identifier: MIT
+"""ChangelogTXT Parser Module."""
 
 from __future__ import annotations
 
-import logging
 import os
 import pathlib
-import re
-import sys
-from typing import Optional, TypedDict
 
-from changelogtxt_parser.version import parse_version
+from changelogtxt_parser import _logs, version
 
-VersionEntry = TypedDict("VersionEntry", {"version": str, "changes": list[str]})
-
-BULLET_RE = re.compile(r"^-")
 DEFAULT_VER = "Unreleased"
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
 
 def _resolve_path(
     path_file: str,
+    *,
     for_write: bool = False,
-    base_dir: Optional[pathlib.Path] = None,
+    base_dir: pathlib.Path | None = None,
 ) -> pathlib.Path:
     path = pathlib.Path(path_file).expanduser()
 
@@ -31,41 +25,43 @@ def _resolve_path(
 
     if for_write:
         path.parent.mkdir(parents=True, exist_ok=True)
-    else:
-        if not path.exists():
-            raise FileNotFoundError(f"File not found: {path}")
+    elif not path.exists():
+        raise FileNotFoundError(f"File not found: {path}")
 
     return path
 
 
-def load(path_file: str) -> list[VersionEntry]:
+def load(path_file: str) -> list[version.VersionEntry]:
+    """Parse a changelog file and returns a list of version entries."""
     file = _resolve_path(path_file)
 
     with file.open("r", encoding="utf-8") as f:
-        changelog: list[VersionEntry] = [{"version": DEFAULT_VER, "changes": []}]
-        current: VersionEntry = changelog[-1]
+        changelog: list[version.VersionEntry] = [
+            {"version": DEFAULT_VER, "changes": []},
+        ]
+        current: version.VersionEntry = changelog[-1]
         need_bullet = False
-        last_v_line_no = None
+        last_line_v = None
 
         for line_no, raw in enumerate(f, start=1):
             line = raw.strip()
             if not line:
                 continue
 
-            if need_bullet and not BULLET_RE.match(line):
+            if need_bullet and not line.startswith("-"):
                 raise ValueError(
                     f"Invalid changelog format at line {line_no}: "
-                    f"Expected a '-' bullet after version declared at line {last_v_line_no}",
+                    f"Expected a '-' bullet after version at line {last_line_v}",
                 )
 
-            if parse_version(line):
+            if version.parse_version(line):
                 current = {"version": line, "changes": []}
                 changelog.append(current)
                 need_bullet = True
-                last_v_line_no = line_no
+                last_line_v = line_no
                 continue
 
-            if BULLET_RE.match(line):
+            if line.startswith("-"):
                 need_bullet = False
                 change = line.lstrip("-").strip()
                 if not change:
@@ -85,8 +81,9 @@ def load(path_file: str) -> list[VersionEntry]:
     return changelog
 
 
-def dump(entries: list[VersionEntry], path_file: str) -> None:
-    path = _resolve_path(path_file, True)
+def dump(entries: list[version.VersionEntry], path_file: str) -> None:
+    """Write a formatted changelog to the specified file path."""
+    path = _resolve_path(path_file, for_write=True)
 
     lines = []
     for e in entries:
@@ -100,25 +97,31 @@ def dump(entries: list[VersionEntry], path_file: str) -> None:
     with path.open("w", encoding="utf-8") as f:
         f.write(content)
 
-    logging.info(f"File generated at: {path}")
+    _logs.logger.info(f"File generated at: {path}")
 
 
-def find_changelogtxt_file(base_path: str = "./") -> str | None:
-    if pathlib.Path(base_path).is_file():
-        return base_path
-    if pathlib.Path(base_path).exists():
+def find_changelogtxt_file(path: str = "./") -> str | None:
+    """Search for a 'CHANGELOG.txt' file starting from the given path."""
+    if pathlib.Path(path).is_file():
+        return path
+    if pathlib.Path(path).exists():
         filename = "CHANGELOG.txt"
-        for root, _, files in os.walk(base_path):
+        for root, _, files in os.walk(path):
             if filename in files:
-                return os.path.join(root, filename)
+                return str(pathlib.Path(root) / filename)
     raise FileNotFoundError(f"{filename} file not found in the specified path.")
 
 
-def update_version(
+def update(
     version: str | None,
     message: str,
     base_path: str = "./",
 ) -> bool:
+    """
+    Add a new change message to the specified version in the changelog file.
+
+    Creates a new version entry if it doesn't exist.
+    """
     if not version:
         version = DEFAULT_VER
 
@@ -144,18 +147,15 @@ def update_version(
 
 
 def check_tag(tag: str, base_path: str = "./") -> bool:
+    """Validate whether a given version tag exists in the changelog file."""
     file_path = find_changelogtxt_file(base_path)
     if file_path:
         logs = load(file_path)
         for log in logs:
             if log["version"] == tag:
-                logging.info(f"Tag validation for '{tag}' was successful.")
+                _logs.logger.info(f"Tag validation for '{tag}' was successful.")
                 return True
-    print(
-        f"Tag '{tag}' not found in changelog.",
-        file=sys.stderr,
-    )
-    return False
+    raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 
 def _changes_count(logs, version):
@@ -166,19 +166,20 @@ def _changes_count(logs, version):
 
 
 def compare_files(source_file: str, target_file: str) -> bool:
+    """Compare two changelog files to detect version or change differences."""
     src_file = load(source_file)
     trg_file = load(target_file)
 
     if len(src_file) != len(trg_file):
-        logging.info("New version")
+        _logs.logger.info("New version")
         return True
 
     src_changes = _changes_count(src_file, DEFAULT_VER)
     trg_changes = _changes_count(trg_file, DEFAULT_VER)
 
     if src_changes != trg_changes:
-        logging.info("New Unreleased point")
+        _logs.logger.info("New Unreleased point")
         return True
 
-    logging.info("No changes")
+    _logs.logger.info("No changes")
     return False

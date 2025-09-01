@@ -3,6 +3,7 @@ import sys
 from typing import Any
 
 import changelogtxt_parser as changelog
+from changelogtxt_parser import _logs
 
 
 def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
@@ -77,13 +78,13 @@ def run_cli() -> None:
         case "check-format":
             if not (path_file := changelog.find_changelogtxt_file(file)):
                 sys.exit(1)
-            print(f"File found in: {path_file}")
+            _logs.logger.info(f"File found in: {path_file}")
             res = changelog.load(path_file)
             sys.exit(int(not res))
         case "compare":
             res = changelog.compare_files(source_file, target_file)
             sys.exit(int(not res))
         case _:
-            print("No command supplied.", file=sys.stderr)
+            _logs.logger.info("No command supplied.")
             parser.print_help()
             sys.exit(1)

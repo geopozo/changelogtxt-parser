@@ -1,7 +1,10 @@
+"""Version Parsing Utilities."""
+
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import TypedDict
 
 import semver
 from packaging import version as pyversion
@@ -74,6 +77,7 @@ _VersionTypes = semver.Version | pyversion.Version | BadVersion | None
 
 
 def parse_version(content: str) -> _VersionTypes:
+    """Attempt to parse a version string using multiple versioning libraries."""
     content = content.removeprefix("v")
     v: _VersionTypes = None
     try:
@@ -91,3 +95,10 @@ def parse_version(content: str) -> _VersionTypes:
     if not v:
         return None
     return v
+
+
+class VersionEntry(TypedDict):
+    """Changelog entry with a version identifier and a list of changes."""
+
+    version: str
+    changes: list[str]
