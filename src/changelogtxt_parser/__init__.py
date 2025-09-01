@@ -18,26 +18,16 @@ def load(path: str) -> tuple[list[version.VersionEntry], str]:
             {"version": DEFAULT_VER, "changes": []},
         ]
         current_entry: version.VersionEntry = changelog[-1]
-        need_bullet = False
-        last_line_v = None
 
         for line_no, raw in enumerate(f, start=1):
             line = raw.strip()
-            if not need_bullet and not line:
+            if not line:
                 continue
 
             if version.parse_version(line):
                 current_entry = {"version": line, "changes": []}
                 changelog.append(current_entry)
-                need_bullet = True
-                last_line_v = line_no
-            elif need_bullet and not line.startswith("-"):
-                raise ValueError(
-                    f"Invalid changelog format at line {line_no}: "
-                    f"Expected a '-' bullet after version at line {last_line_v}",
-                )
             elif line.startswith("-"):
-                need_bullet = False
                 change = line.lstrip("-").strip()
                 if not change:
                     raise ValueError(
@@ -47,6 +37,11 @@ def load(path: str) -> tuple[list[version.VersionEntry], str]:
                 current_entry["changes"].append(change)
             elif changes := current_entry["changes"]:
                 changes[-1] += f" {line}"
+            else:
+                raise ValueError(
+                    f"Invalid changelog format at line {line_no}: "
+                    'Expected "-" and then text content',
+                )
 
     return changelog, file_path
 
