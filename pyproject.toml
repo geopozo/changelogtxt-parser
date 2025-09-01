@@ -13,8 +13,10 @@ readme = "README.md"
 requires-python = ">=3.10"
 license.file = "LICENSE"
 authors = [
-  { name = "Andrew Pikul", email = "ajpikul@gmail.com" },
   { name = "David Angarita", email = "davidangarita.sistemas@gmail.com" }
+]
+maintainers = [
+  { name = "Andrew Pikul", email = "ajpikul@gmail.com" }
 ]
 dependencies = [
     "packaging>=25.0",
