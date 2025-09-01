@@ -73,26 +73,24 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
 def run_cli() -> None:
     parser, cli_args = _get_cli_args()
     tag = cli_args.pop("tag", None)
-    file = cli_args.get("file", "")
-    source_file = cli_args.get("source", "")
-    target_file = cli_args.get("target", "")
+    file = cli_args.pop("file", "")
+    source_file = cli_args.pop("source", "")
+    target_file = cli_args.pop("target", "")
     command = cli_args.pop("command", None)
 
     match command:
         case "check-tag":
             res = changelog.check_tag(tag, file)
-            _utils.logger.info(res)
-            sys.exit(int(not res))
         case "check-format":
             path_file = _utils.find_file(file)
             res = changelog.load(path_file)
-            _utils.logger.info(res)
-            sys.exit(int(not res))
         case "compare":
             res = changelog.compare_files(source_file, target_file)
-            _utils.logger.info(res or "No changes")
-            sys.exit(int(not res))
+            res = res or "No changes"
         case _:
-            _utils.logger.info("No command supplied.")
+            res = "No command supplied."
             parser.print_help()
             sys.exit(1)
+
+    _utils.logger.info(res)
+    sys.exit(int(not res))
