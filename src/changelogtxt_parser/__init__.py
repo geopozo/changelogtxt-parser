@@ -3,37 +3,14 @@
 
 from __future__ import annotations
 
-import os
-import pathlib
-
-from changelogtxt_parser import _logs, version
+from changelogtxt_parser import _utils, version
 
 DEFAULT_VER = "Unreleased"
 
 
-def _resolve_path(
-    path_file: str,
-    *,
-    for_write: bool = False,
-    base_dir: pathlib.Path | None = None,
-) -> pathlib.Path:
-    path = pathlib.Path(path_file).expanduser()
-
-    if not path.is_absolute():
-        base = base_dir if base_dir else pathlib.Path.cwd()
-        path = (base / path).resolve()
-
-    if for_write:
-        path.parent.mkdir(parents=True, exist_ok=True)
-    elif not path.exists():
-        raise FileNotFoundError(f"File not found: {path}")
-
-    return path
-
-
 def load(path_file: str) -> list[version.VersionEntry]:
     """Parse a changelog file and returns a list of version entries."""
-    file = _resolve_path(path_file)
+    file = _utils.resolve_path(path_file)
 
     with file.open("r", encoding="utf-8") as f:
         changelog: list[version.VersionEntry] = [
@@ -83,7 +60,7 @@ def load(path_file: str) -> list[version.VersionEntry]:
 
 def dump(entries: list[version.VersionEntry], path_file: str) -> None:
     """Write a formatted changelog to the specified file path."""
-    path = _resolve_path(path_file, for_write=True)
+    path = _utils.resolve_path(path_file, for_write=True)
 
     lines = []
     for e in entries:
@@ -97,26 +74,14 @@ def dump(entries: list[version.VersionEntry], path_file: str) -> None:
     with path.open("w", encoding="utf-8") as f:
         f.write(content)
 
-    _logs.logger.info(f"File generated at: {path}")
-
-
-def find_changelogtxt_file(path: str = "./") -> str | None:
-    """Search for a 'CHANGELOG.txt' file starting from the given path."""
-    if pathlib.Path(path).is_file():
-        return path
-    if pathlib.Path(path).is_dir():
-        filename = "CHANGELOG.txt"
-        for root, _, files in os.walk(path):
-            if filename in files:
-                return str(pathlib.Path(root) / filename)
-    raise FileNotFoundError(f"{filename} file not found in the specified path.")
+    _utils.logger.info(f"File generated at: {path}")
 
 
 def update(
     version: str | None,
     message: str,
-    base_path: str = "./",
-) -> bool:
+    path: str = "./",
+) -> str:
     """
     Add a new change message to the specified version in the changelog file.
 
@@ -131,30 +96,28 @@ def update(
     if not message:
         raise ValueError("Message must not be empty.")
 
-    path_file = find_changelogtxt_file(base_path)
-    if path_file:
-        logs = load(path_file)
-        for log in logs:
-            if log["version"] == version:
-                log["changes"].append(message)
-                break
-            else:
-                logs.insert(1, {"version": version, "changes": [message]})
+    path_file = _utils.find_file(path)
+    logs = load(path_file)
+    for log in logs:
+        if log["version"] == version:
+            log["changes"].append(message)
+            break
+        else:
+            logs.insert(1, {"version": version, "changes": [message]})
+            break
 
-        dump(logs, path_file)
-        return True
-    return False
+    dump(logs, path_file)
+    return f"File update for {path_file} was successful"
 
 
-def check_tag(tag: str, base_path: str = "./") -> bool:
+def check_tag(tag: str, base_path: str = "./") -> str:
     """Validate whether a given version tag exists in the changelog file."""
-    file_path = find_changelogtxt_file(base_path)
+    file_path = _utils.find_file(base_path)
     if file_path:
         logs = load(file_path)
         for log in logs:
             if log["version"] == tag:
-                _logs.logger.info(f"Tag validation for '{tag}' was successful.")
-                return True
+                return f"Tag validation for '{tag}' was successful."
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 
@@ -165,21 +128,18 @@ def _changes_count(logs, version):
     return 0
 
 
-def compare_files(source_file: str, target_file: str) -> bool:
+def compare_files(source_file: str, target_file: str) -> str | None:
     """Compare two changelog files to detect version or change differences."""
     src_file = load(source_file)
     trg_file = load(target_file)
 
     if len(src_file) != len(trg_file):
-        _logs.logger.info("New version")
-        return True
+        return "New version"
 
     src_changes = _changes_count(src_file, DEFAULT_VER)
     trg_changes = _changes_count(trg_file, DEFAULT_VER)
 
     if src_changes != trg_changes:
-        _logs.logger.info("New Unreleased point")
-        return True
+        return "New Unreleased point"
 
-    _logs.logger.info("No changes")
-    return False
+    return None
