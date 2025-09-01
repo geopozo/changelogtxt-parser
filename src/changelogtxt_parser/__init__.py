@@ -8,11 +8,11 @@ from changelogtxt_parser import _utils, version
 DEFAULT_VER = "Unreleased"
 
 
-def load(path_file: str) -> list[version.VersionEntry]:
+def load(path: str) -> list[version.VersionEntry]:
     """Parse a changelog file and returns a list of version entries."""
-    file = _utils.resolve_path(path_file)
+    file_path = _utils.resolve_path(path)
 
-    with file.open("r", encoding="utf-8") as f:
+    with file_path.open("r", encoding="utf-8") as f:
         changelog: list[version.VersionEntry] = [
             {"version": DEFAULT_VER, "changes": []},
         ]
@@ -57,23 +57,23 @@ def load(path_file: str) -> list[version.VersionEntry]:
     return changelog
 
 
-def dump(entries: list[version.VersionEntry], path_file: str) -> None:
+def dump(entries: list[version.VersionEntry], path: str) -> None:
     """Write a formatted changelog to the specified file path."""
-    path = _utils.resolve_path(path_file, for_write=True)
+    file_path = _utils.resolve_path(path, for_write=True)
 
     lines = []
-    for e in entries:
-        if e["version"] == DEFAULT_VER and not e["changes"]:
+    for entry in entries:
+        if entry["version"] == DEFAULT_VER and not entry["changes"]:
             continue
-        header = [] if e["version"] == DEFAULT_VER else [e["version"]]
-        lines.append("\n".join(header + [f"- {c}" for c in e["changes"]]))
+        header = [] if entry["version"] == DEFAULT_VER else [entry["version"]]
+        lines.append("\n".join(header + [f"- {c}" for c in entry["changes"]]))
 
     content: str = "\n\n".join(lines) + "\n"
 
-    with path.open("w", encoding="utf-8") as f:
+    with file_path.open("w", encoding="utf-8") as f:
         f.write(content)
 
-    _utils.logger.info(f"File generated at: {path}")
+    _utils.logger.info(f"File generated at: {file_path}")
 
 
 def update(
@@ -95,27 +95,27 @@ def update(
     if not message:
         raise ValueError("Message must not be empty.")
 
-    path_file = _utils.find_file(path)
-    logs = load(path_file)
-    for log in logs:
-        if log["version"] == version:
-            log["changes"].append(message)
+    file_path = _utils.find_file(path)
+    entries = load(file_path)
+    for entry in entries:
+        if entry["version"] == version:
+            entry["changes"].append(message)
             break
         else:
-            logs.insert(1, {"version": version, "changes": [message]})
+            entries.insert(1, {"version": version, "changes": [message]})
             break
 
-    dump(logs, path_file)
-    return f"File update for {path_file} was successful"
+    dump(entries, file_path)
+    return f"File update for {file_path} was successful"
 
 
-def check_tag(tag: str, base_path: str = "./") -> str:
+def check_tag(tag: str, path: str = "./") -> str:
     """
     Validate whether a given version tag exists in the changelog file.
 
     Prefixes the tag with 'v' if missing.
     """
-    file_path = _utils.find_file(base_path)
+    file_path = _utils.find_file(path)
     if not tag.startswith("v"):
         tag = f"v{tag}"
 

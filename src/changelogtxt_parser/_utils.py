@@ -7,23 +7,23 @@ logger = logging.getLogger(__name__)
 
 
 def resolve_path(
-    path_file: str,
+    path: str,
     *,
     for_write: bool = False,
     base_dir: pathlib.Path | None = None,
 ) -> pathlib.Path:
-    path = pathlib.Path(path_file).expanduser()
+    file_path = pathlib.Path(path).expanduser()
 
-    if not path.is_absolute():
+    if not file_path.is_absolute():
         base = base_dir if base_dir else pathlib.Path.cwd()
-        path = (base / path).resolve()
+        file_path = (base / file_path).resolve()
 
     if for_write:
-        path.parent.mkdir(parents=True, exist_ok=True)
-    elif not path.exists():
-        raise FileNotFoundError(f"File not found: {path}")
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+    elif not file_path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
 
-    return path
+    return file_path
 
 
 def find_file(path: str = "./") -> str:
