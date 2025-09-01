@@ -10,13 +10,11 @@ def resolve_path(
     path: str,
     *,
     for_write: bool = False,
-    base_dir: pathlib.Path | None = None,
 ) -> pathlib.Path:
     file_path = pathlib.Path(path).expanduser()
 
     if not file_path.is_absolute():
-        base = base_dir if base_dir else pathlib.Path.cwd()
-        file_path = (base / file_path).resolve()
+        file_path = file_path.resolve()
 
     if for_write:
         file_path.parent.mkdir(parents=True, exist_ok=True)
