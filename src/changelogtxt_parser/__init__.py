@@ -54,7 +54,6 @@ def load(path_file: str) -> list[version.VersionEntry]:
                 current_list[-1] += f" {line}"
             else:
                 current_list.append(line)
-
     return changelog
 
 
@@ -111,8 +110,15 @@ def update(
 
 
 def check_tag(tag: str, base_path: str = "./") -> str:
-    """Validate whether a given version tag exists in the changelog file."""
+    """
+    Validate whether a given version tag exists in the changelog file.
+
+    Prefixes the tag with 'v' if missing.
+    """
     file_path = _utils.find_file(base_path)
+    if not tag.startswith("v"):
+        tag = f"v{tag}"
+
     if file_path:
         logs = load(file_path)
         for log in logs:
