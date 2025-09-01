@@ -17,29 +17,26 @@ def load(path: str) -> tuple[list[version.VersionEntry], str]:
         changelog: list[version.VersionEntry] = [
             {"version": DEFAULT_VER, "changes": []},
         ]
-        current: version.VersionEntry = changelog[-1]
+        current_entry: version.VersionEntry = changelog[-1]
         need_bullet = False
         last_line_v = None
 
         for line_no, raw in enumerate(f, start=1):
             line = raw.strip()
-            if not line:
+            if not need_bullet and not line:
                 continue
 
-            if need_bullet and not line.startswith("-"):
+            if version.parse_version(line):
+                current_entry = {"version": line, "changes": []}
+                changelog.append(current_entry)
+                need_bullet = True
+                last_line_v = line_no
+            elif need_bullet and not line.startswith("-"):
                 raise ValueError(
                     f"Invalid changelog format at line {line_no}: "
                     f"Expected a '-' bullet after version at line {last_line_v}",
                 )
-
-            if version.parse_version(line):
-                current = {"version": line, "changes": []}
-                changelog.append(current)
-                need_bullet = True
-                last_line_v = line_no
-                continue
-
-            if line.startswith("-"):
+            elif line.startswith("-"):
                 need_bullet = False
                 change = line.lstrip("-").strip()
                 if not change:
@@ -47,14 +44,10 @@ def load(path: str) -> tuple[list[version.VersionEntry], str]:
                         f"Invalid changelog format at line {line_no}: "
                         f'Expected content after "-"',
                     )
-                current["changes"].append(change)
-                continue
+                current_entry["changes"].append(change)
+            elif changes := current_entry["changes"]:
+                changes[-1] += f" {line}"
 
-            current_list = current["changes"]
-            if current_list:
-                current_list[-1] += f" {line}"
-            else:
-                current_list.append(line)
     return changelog, file_path
 
 
