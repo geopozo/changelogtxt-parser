@@ -27,14 +27,13 @@ def resolve_path(
 
 
 def find_file(path: str = "./") -> str:
-    """Search for a 'CHANGELOG.txt' file starting from the given path."""
     if pathlib.Path(path).is_file():
         return path
     if pathlib.Path(path).is_dir():
         filename = "CHANGELOG.txt"
         for root, _, files in os.walk(path):
             if filename in files:
-                path_file = str(pathlib.Path(root) / filename)
-                logger.info(f"File found in: {path_file}")
-                return path_file
+                file_path = str(pathlib.Path(root) / filename)
+                logger.info(f"File found in: {file_path}")
+                return file_path
     raise FileNotFoundError(f"{filename} file not found in the specified path.")

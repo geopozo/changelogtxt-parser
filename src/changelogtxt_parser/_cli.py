@@ -82,8 +82,7 @@ def run_cli() -> None:
         case "check-tag":
             res = changelog.check_tag(tag, file)
         case "check-format":
-            path_file = _utils.find_file(file)
-            res = changelog.load(path_file)
+            res, _ = changelog.load(file)
         case "compare":
             res = changelog.compare_files(source_file, target_file)
             res = res or "No changes"

@@ -8,11 +8,12 @@ from changelogtxt_parser import _utils, version
 DEFAULT_VER = "Unreleased"
 
 
-def load(path: str) -> list[version.VersionEntry]:
+def load(path: str) -> tuple[list[version.VersionEntry], str]:
     """Parse a changelog file and returns a list of version entries."""
-    file_path = _utils.resolve_path(path)
+    file_path = _utils.find_file(path)
+    file = _utils.resolve_path(file_path)
 
-    with file_path.open("r", encoding="utf-8") as f:
+    with file.open("r", encoding="utf-8") as f:
         changelog: list[version.VersionEntry] = [
             {"version": DEFAULT_VER, "changes": []},
         ]
@@ -54,12 +55,12 @@ def load(path: str) -> list[version.VersionEntry]:
                 current_list[-1] += f" {line}"
             else:
                 current_list.append(line)
-    return changelog
+    return changelog, file_path
 
 
 def dump(entries: list[version.VersionEntry], path: str) -> None:
     """Write a formatted changelog to the specified file path."""
-    file_path = _utils.resolve_path(path, for_write=True)
+    file = _utils.resolve_path(path, for_write=True)
 
     lines = []
     for entry in entries:
@@ -70,10 +71,10 @@ def dump(entries: list[version.VersionEntry], path: str) -> None:
 
     content: str = "\n\n".join(lines) + "\n"
 
-    with file_path.open("w", encoding="utf-8") as f:
+    with file.open("w", encoding="utf-8") as f:
         f.write(content)
 
-    _utils.logger.info(f"File generated at: {file_path}")
+    _utils.logger.info(f"File generated at: {file}")
 
 
 def update(
@@ -95,8 +96,7 @@ def update(
     if not message:
         raise ValueError("Message must not be empty.")
 
-    file_path = _utils.find_file(path)
-    entries = load(file_path)
+    entries, file_path = load(path)
     for entry in entries:
         if entry["version"] == version:
             entry["changes"].append(message)
@@ -115,29 +115,27 @@ def check_tag(tag: str, path: str = "./") -> str:
 
     Prefixes the tag with 'v' if missing.
     """
-    file_path = _utils.find_file(path)
     if not tag.startswith("v"):
         tag = f"v{tag}"
 
-    if file_path:
-        logs = load(file_path)
-        for log in logs:
-            if log["version"] == tag:
-                return f"Tag validation for '{tag}' was successful."
+    entries, _ = load(path)
+    for entry in entries:
+        if entry["version"] == tag:
+            return f"Tag validation for '{tag}' was successful."
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 
-def _changes_count(logs, version):
-    for log in logs:
-        if log["version"] == version:
-            return len(log["changes"])
+def _changes_count(entries, version):
+    for entry in entries:
+        if entry["version"] == version:
+            return len(entry["changes"])
     return 0
 
 
 def compare_files(source_file: str, target_file: str) -> str | None:
     """Compare two changelog files to detect version or change differences."""
-    src_file = load(source_file)
-    trg_file = load(target_file)
+    src_file, _ = load(source_file)
+    trg_file, _ = load(target_file)
 
     if len(src_file) != len(trg_file):
         return "New version"
