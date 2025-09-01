@@ -104,7 +104,7 @@ def find_changelogtxt_file(path: str = "./") -> str | None:
     """Search for a 'CHANGELOG.txt' file starting from the given path."""
     if pathlib.Path(path).is_file():
         return path
-    if pathlib.Path(path).exists():
+    if pathlib.Path(path).is_dir():
         filename = "CHANGELOG.txt"
         for root, _, files in os.walk(path):
             if filename in files:
