@@ -9,7 +9,7 @@ def update(
     version: str | None,
     message: str,
     path: str = "./",
-) -> str:
+) -> None:
     """
     Add a new change message to the specified version in the changelog file.
 
@@ -25,19 +25,18 @@ def update(
         raise ValueError("Message must not be empty.")
 
     entries, file_path = serdes.load(path)
+
     for entry in entries:
         if entry["version"] == version:
             entry["changes"].append(message)
             break
-        else:
-            entries.insert(1, {"version": version, "changes": [message]})
-            break
+    else:
+        entries.insert(1, {"version": version, "changes": [message]})
 
     serdes.dump(entries, file_path)
-    return f"File update for {file_path} was successful"
 
 
-def check_tag(tag: str, path: str = "./") -> str:
+def check_tag(tag: str, path: str = "./") -> None:
     """
     Validate whether a given version tag exists in the changelog file.
 
@@ -49,7 +48,7 @@ def check_tag(tag: str, path: str = "./") -> str:
     entries, _ = serdes.load(path)
     for entry in entries:
         if entry["version"] == tag:
-            return f"Tag validation for '{tag}' was successful."
+            return
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 
@@ -74,4 +73,4 @@ def compare_files(source_file: str, target_file: str) -> str | None:
     if src_changes != trg_changes:
         return "New Unreleased point"
 
-    return None
+    raise ValueError("Comparison failed: no differences found between the files.")
