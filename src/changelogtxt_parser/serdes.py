@@ -54,11 +54,8 @@ def dump(entries: list[version_tools.VersionEntry], path: str) -> None:
         version = entry["version"]
         changes = entry["changes"]
 
-        valid_version = version_tools.parse_version(version)
-        ver_label = version if valid_version else DEFAULT_VER
-
-        section = [ver_label] if ver_label != DEFAULT_VER else []
-        section += [f"- {change}" for change in changes]
+        section = [str(_s)] if (_s := version_tools.parse_version(version)) else []
+        section.extend([f"- {change}" for change in changes])
         changelog.append("\n".join(section))
 
     content: str = "\n\n".join(changelog) + "\n"
