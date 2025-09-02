@@ -46,7 +46,7 @@ def load(path: str) -> list[version_tools.VersionEntry]:
 
 def dump(entries: list[version_tools.VersionEntry], path: str) -> None:
     """Write a formatted changelog to the specified file path."""
-    file = _utils.resolve_path(path, for_write=True)
+    file = _utils.resolve_path(path, touch=True)
 
     changelog = []
     for entry in entries:

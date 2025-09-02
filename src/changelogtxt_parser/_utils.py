@@ -11,16 +11,17 @@ logger = logging.getLogger(__name__)
 def resolve_path(
     path: str,
     *,
-    for_write: bool = False,
+    touch: bool = False,
 ) -> pathlib.Path:
     file_path = pathlib.Path(path).expanduser()
 
     if not file_path.is_absolute():
         file_path = file_path.resolve()
 
-    if for_write:
-        file_path.parent.mkdir(parents=True, exist_ok=True)
-    elif not file_path.exists():
+    if touch:
+        file_path.touch()
+
+    if not file_path.exists():
         raise FileNotFoundError(f"File not found: {file_path}")
 
     return file_path
