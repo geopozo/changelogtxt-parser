@@ -46,7 +46,7 @@ def check_tag(tag: str, path: str = "./") -> None:
     if not tag.startswith("v"):
         tag = f"v{tag}"
 
-    entries, _ = serdes.load(path)
+    entries = serdes.load(path)
     for entry in entries:
         if entry["version"] == tag:
             return
