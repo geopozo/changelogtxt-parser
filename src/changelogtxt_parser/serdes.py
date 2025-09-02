@@ -8,10 +8,9 @@ from changelogtxt_parser import version as version_tools
 DEFAULT_VER = "Unreleased"
 
 
-def load(path: str) -> tuple[list[version_tools.VersionEntry], str]:
+def load(path: str) -> list[version_tools.VersionEntry]:
     """Parse a changelog file and returns a list of version entries."""
-    file_path = _utils.find_file(path)
-    file = _utils.resolve_path(file_path)
+    file = _utils.resolve_path(path)
 
     with file.open("r", encoding="utf-8") as f:
         changelog: list[version_tools.VersionEntry] = [
@@ -42,7 +41,7 @@ def load(path: str) -> tuple[list[version_tools.VersionEntry], str]:
                     f"Invalid changelog format at line {line_no}: "
                     'Expected "-" and then text content',
                 )
-    return changelog, file_path
+    return changelog
 
 
 def dump(entries: list[version_tools.VersionEntry], path: str) -> None:
