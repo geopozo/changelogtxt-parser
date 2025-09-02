@@ -52,9 +52,9 @@ def check_tag(tag: str, path: str = "./") -> None:
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 
-def _changes_count(entries, version):
+def _changes_count(entries):
     for entry in entries:
-        if entry["version"] == version:
+        if entry["version"] == DEFAULT_VER:
             return len(entry["changes"])
     return 0
 
@@ -67,8 +67,8 @@ def compare_files(source_file: str, target_file: str) -> str | None:
     if len(src_file) != len(trg_file):
         return "New version"
 
-    src_changes = _changes_count(src_file, DEFAULT_VER)
-    trg_changes = _changes_count(trg_file, DEFAULT_VER)
+    src_changes = _changes_count(src_file)
+    trg_changes = _changes_count(trg_file)
 
     if src_changes != trg_changes:
         return "New Unreleased point"
