@@ -7,34 +7,34 @@ DEFAULT_VER = "Unreleased"
 
 
 def update(
-    version: str | None,
+    version: str,
     message: str,
-    path: str = "./",
+    path: str,
+    *,
+    force=False,
 ) -> None:
     """
     Add a new change message to the specified version in the changelog file.
 
     Creates a new version entry if it doesn't exist.
     """
-    if not version:
-        version = DEFAULT_VER
-
-    if not version.startswith("v"):
-        version = f"v{version}"
-
     if not message:
         raise ValueError("Message must not be empty.")
 
-    entries, file_path = serdes.load(path)
+    new_version = str(version_tools.parse_version(version) or DEFAULT_VER)
+    entries = serdes.load(path)
 
     for entry in entries:
-        if entry["version"] == version:
-            entry["changes"].append(message)
-            break
+        if new_version == entry["version"]:
+            if force or new_version == DEFAULT_VER:
+                entry["changes"].append(message)
+                break
+            else:
+                raise ValueError("Cannot overwrite an existing version.")
     else:
-        entries.insert(1, {"version": version, "changes": [message]})
+        entries.insert(1, {"version": f"v{new_version}", "changes": [message]})
 
-    serdes.dump(entries, file_path)
+    serdes.dump(entries, path)
 
 
 def check_tag(tag: str, path: str = "./") -> None:
