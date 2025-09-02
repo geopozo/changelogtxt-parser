@@ -2,7 +2,7 @@ import argparse
 import sys
 from typing import Any
 
-from changelogtxt_parser import app, serdes
+from changelogtxt_parser import _utils, app, serdes
 
 # ruff: noqa: T201 allow print in CLI
 
@@ -106,19 +106,23 @@ def run_cli() -> None:
 
     match command:
         case "check-tag":
+            file = _utils.find_file(file)
             app.check_tag(tag, file)
             print(f"Tag validation for {tag} was successful.")
         case "check-format":
+            file = _utils.find_file(file)
             serdes.load(file)
             print("Changelog format validation was successful.")
         case "compare":
             if diff := app.compare_files(source_file, target_file):
                 print(diff)
             else:
-                print("No changes found")
+                print("No changes found", file=sys.stderr)
+                sys.exit(1)
         case "update":
+            file = _utils.find_file(file)
             app.update(tag, message, file)
-            print("File update was successful and generated at: {file}")
+            print(f"File update was successful and generated at: {file}")
         case _:
             print("No command supplied.", file=sys.stderr)
             parser.print_help()
