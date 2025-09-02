@@ -111,37 +111,35 @@ def run_cli() -> None:
             try:
                 app.check_tag(tag, file)
                 logger.info(f"Tag validation for {tag} was successful.")
-                reteval = 0
+                sys.exit(0)
             except (ValueError, TypeError):
                 logger.exception("Invalid tag")
-                reteval = 1
+                sys.exit(1)
         case "check-format":
             try:
                 serdes.load(file)
                 logger.info("Changelog format validation was successful.")
-                reteval = 0
+                sys.exit(0)
             except ValueError:
                 logger.exception("Invalid changelog format")
-                reteval = 1
+                sys.exit(1)
         case "compare":
             try:
                 res = app.compare_files(source_file, target_file)
                 logger.info(res)
-                reteval = 0
+                sys.exit(0)
             except ValueError:
                 logger.exception("No changes founded")
-                reteval = 1
+                sys.exit(1)
         case "update":
             try:
                 app.update(tag, message, file)
                 logger.info("File update was successful and generated at: {file}")
-                reteval = 0
+                sys.exit(0)
             except ValueError:
                 logger.exception("File update failed")
-                reteval = 1
+                sys.exit(1)
         case _:
             logger.error("No command supplied.")
             parser.print_help()
             sys.exit(1)
-
-    sys.exit(reteval)
