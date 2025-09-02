@@ -90,6 +90,11 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         required=False,
         default="./",
     )
+    update.add_argument(
+        "--force",
+        action="store_true",
+        help="Force update of an existing version",
+    )
 
     basic_args = parser.parse_args()
     return parser, vars(basic_args)
@@ -101,7 +106,8 @@ def run_cli() -> None:
     file = cli_args.pop("file", "")
     source_file = cli_args.pop("source", "")
     target_file = cli_args.pop("target", "")
-    message = cli_args.pop("message", "")
+    message = cli_args.pop("message", None)
+    force = cli_args.pop("force", "")
     command = cli_args.pop("command", None)
 
     match command:
@@ -121,7 +127,7 @@ def run_cli() -> None:
                 sys.exit(1)
         case "update":
             file = _utils.find_file(file)
-            app.update(tag, message, file)
+            app.update(tag, message, file, force=force)
             print(f"File update was successful and generated at: {file}")
         case _:
             print("No command supplied.", file=sys.stderr)
