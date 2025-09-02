@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import pathlib
+from typing import Any
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ def find_file(path: str = "./") -> str:
     raise FileNotFoundError(f"{filename} file not found in the specified path.")
 
 
-def get_diffs(source, target) -> list[str]:
+def get_diffs(source: list[Any], target: list[Any]) -> list[str]:
     set1 = {json.dumps(entry, sort_keys=True) for entry in source}
     set2 = {json.dumps(entry, sort_keys=True) for entry in target}
     diffs = set1.symmetric_difference(set2)

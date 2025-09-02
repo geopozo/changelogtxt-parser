@@ -1,6 +1,7 @@
 """App ChangelogTXT Module."""
 
 from changelogtxt_parser import _utils, serdes
+from changelogtxt_parser import version as version_tools
 
 DEFAULT_VER = "Unreleased"
 
@@ -52,7 +53,7 @@ def check_tag(tag: str, path: str = "./") -> None:
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 
-def _changes_count(entries):
+def _changes_count(entries: list[version_tools.VersionEntry]) -> int:
     for entry in entries:
         if entry["version"] == DEFAULT_VER:
             return len(entry["changes"])
