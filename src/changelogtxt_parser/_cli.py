@@ -1,12 +1,10 @@
 import argparse
-import logging
 import sys
 from typing import Any
 
 from changelogtxt_parser import app, serdes
 
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
+# ruff: noqa: T201 allow print in CLI
 
 
 def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
@@ -108,38 +106,20 @@ def run_cli() -> None:
 
     match command:
         case "check-tag":
-            try:
-                app.check_tag(tag, file)
-                logger.info(f"Tag validation for {tag} was successful.")
-                sys.exit(0)
-            except (ValueError, TypeError):
-                logger.exception("Invalid tag")
-                sys.exit(1)
+            app.check_tag(tag, file)
+            print(f"Tag validation for {tag} was successful.")
         case "check-format":
-            try:
-                serdes.load(file)
-                logger.info("Changelog format validation was successful.")
-                sys.exit(0)
-            except ValueError:
-                logger.exception("Invalid changelog format")
-                sys.exit(1)
+            serdes.load(file)
+            print("Changelog format validation was successful.")
         case "compare":
-            try:
-                res = app.compare_files(source_file, target_file)
-                logger.info(res)
-                sys.exit(0)
-            except ValueError:
-                logger.exception("No changes founded")
-                sys.exit(1)
+            if diff := app.compare_files(source_file, target_file):
+                print(diff)
+            else:
+                print("No changes found")
         case "update":
-            try:
-                app.update(tag, message, file)
-                logger.info("File update was successful and generated at: {file}")
-                sys.exit(0)
-            except ValueError:
-                logger.exception("File update failed")
-                sys.exit(1)
+            app.update(tag, message, file)
+            print("File update was successful and generated at: {file}")
         case _:
-            logger.error("No command supplied.")
+            print("No command supplied.", file=sys.stderr)
             parser.print_help()
             sys.exit(1)
