@@ -18,7 +18,7 @@ def resolve_path(
     if not file_path.is_absolute():
         file_path = file_path.resolve()
 
-    if for_write:
+    if for_write: # debemos tener dos situaciones?
         file_path.parent.mkdir(parents=True, exist_ok=True)
     elif not file_path.exists():
         raise FileNotFoundError(f"File not found: {file_path}")
@@ -38,7 +38,7 @@ def find_file(path: str = "./") -> str:
                 return file_path
     raise FileNotFoundError(f"{filename} file not found in the specified path.")
 
-
+# esto es... algo nuevo
 def get_diffs(source: list[Any], target: list[Any]) -> list[str]:
     set1 = {json.dumps(entry, sort_keys=True) for entry in source}
     set2 = {json.dumps(entry, sort_keys=True) for entry in target}

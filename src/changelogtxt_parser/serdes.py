@@ -8,6 +8,7 @@ from changelogtxt_parser import version as version_tools
 DEFAULT_VER = "Unreleased"
 
 
+# no.... no devuelves filepath, hazlo separado para solo para _CLI entonces
 def load(path: str) -> tuple[list[version_tools.VersionEntry], str]:
     """Parse a changelog file and returns a list of version entries."""
     file_path = _utils.find_file(path)
@@ -54,6 +55,9 @@ def dump(entries: list[version_tools.VersionEntry], path: str) -> None:
         version = entry["version"]
         changes = entry["changes"]
 
+        # por el otro lado, si esto pasa mas de una vez, es un error. Solo
+        # podemos tener UNA version que no se parsea, y tiene que ser la primera
+        # versión?
         section = [str(_s)] if (_s := version_tools.parse_version(version)) else []
         section.extend([f"- {change}" for change in changes])
         changelog.append("\n".join(section))
@@ -61,4 +65,4 @@ def dump(entries: list[version_tools.VersionEntry], path: str) -> None:
     content: str = "\n\n".join(changelog) + "\n"
 
     with file.open("w", encoding="utf-8") as f:
-        f.write(content.strip())
+        f.write(content.strip()) # ? sale como quieres? o quita \n

@@ -106,6 +106,11 @@ def run_cli() -> None:
     message = cli_args.pop("message", "")
     command = cli_args.pop("command", None)
 
+
+    # en los except, logger.exception() contiene información que debe estár
+    # en el mensaje del error. creo que no necestias los except.
+    # sys.exit(1) es automatic so hay error.
+    # y creo que exception es menos informativo que permetir leventar el error.
     match command:
         case "check-tag":
             try:
@@ -113,8 +118,9 @@ def run_cli() -> None:
                 logger.info(f"Tag validation for {tag} was successful.")
                 sys.exit(0)
             except (ValueError, TypeError):
-                logger.exception("Invalid tag")
-                sys.exit(1)
+                logger.exception("Invalid tag") # estás seguro
+                sys.exit(1) # si levantas el error, esto es automatico
+
         case "check-format":
             try:
                 serdes.load(file)
@@ -125,6 +131,7 @@ def run_cli() -> None:
                 sys.exit(1)
         case "compare":
             try:
+                # donde usas res?
                 res = app.compare_files(source_file, target_file)
                 logger.info(res)
                 sys.exit(0)

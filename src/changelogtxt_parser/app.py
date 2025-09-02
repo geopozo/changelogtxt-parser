@@ -20,14 +20,14 @@ def update(
         version = DEFAULT_VER
 
     if not version.startswith("v"):
-        version = f"v{version}"
+        version = f"v{version}" # el mismo problema con unreleased?
 
     if not message:
         raise ValueError("Message must not be empty.")
 
     entries, file_path = serdes.load(path)
 
-    for entry in entries:
+    for entry in entries: # no hay -- force?
         if entry["version"] == version:
             entry["changes"].append(message)
             break
@@ -67,6 +67,7 @@ def compare_files(source_file: str, target_file: str) -> list[str]:
     src_changes = _changes_count(src_file)
     trg_changes = _changes_count(trg_file)
 
+    # creo que prefiero que tuviste antes
     if len(src_file) != len(trg_file) or src_changes != trg_changes:
         return _utils.get_diffs(src_file, trg_file)
 
