@@ -80,8 +80,8 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
     update.add_argument(
         "-m",
         "--message",
-        help="Message is required.",
-        required=True,
+        help="Message to add change from version",
+        required=False,
     )
     update.add_argument(
         "-f",
