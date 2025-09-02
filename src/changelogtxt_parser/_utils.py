@@ -39,8 +39,8 @@ def find_file(path: str = "./") -> str:
     raise FileNotFoundError(f"{filename} file not found in the specified path.")
 
 
-def get_diffs(source: list[Any], target: list[Any]) -> list[str]:
+def get_diffs(source: list[Any], target: list[Any]) -> list[Any]:
     set1 = {json.dumps(entry, sort_keys=True) for entry in source}
     set2 = {json.dumps(entry, sort_keys=True) for entry in target}
-    diffs = set1.symmetric_difference(set2)
-    return list(diffs)
+    diffs = [json.loads(diff) for diff in list(set1.symmetric_difference(set2))]
+    return diffs
