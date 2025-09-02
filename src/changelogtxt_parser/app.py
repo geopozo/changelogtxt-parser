@@ -60,14 +60,17 @@ def _changes_count(entries: list[version_tools.VersionEntry]) -> int:
     return 0
 
 
-def compare_files(source_file: str, target_file: str) -> list[str]:
+def compare_files(
+    source_file: str,
+    target_file: str,
+) -> list[version_tools.VersionEntry]:
     """Compare two changelog files to detect version or change differences."""
-    src_file, _ = serdes.load(source_file)
-    trg_file, _ = serdes.load(target_file)
+    src_file = serdes.load(source_file)
+    trg_file = serdes.load(target_file)
     src_changes = _changes_count(src_file)
     trg_changes = _changes_count(trg_file)
 
     if len(src_file) != len(trg_file) or src_changes != trg_changes:
         return _utils.get_diffs(src_file, trg_file)
 
-    raise ValueError("Comparison failed: no differences found between the files.")
+    return []
