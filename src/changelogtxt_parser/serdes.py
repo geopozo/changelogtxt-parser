@@ -42,7 +42,6 @@ def load(path: str) -> tuple[list[version_tools.VersionEntry], str]:
                     f"Invalid changelog format at line {line_no}: "
                     'Expected "-" and then text content',
                 )
-
     return changelog, file_path
 
 
@@ -50,17 +49,19 @@ def dump(entries: list[version_tools.VersionEntry], path: str) -> None:
     """Write a formatted changelog to the specified file path."""
     file = _utils.resolve_path(path, for_write=True)
 
-    lines = []
+    changelog = []
     for entry in entries:
-        version = entry["version"] or DEFAULT_VER
-        if version and not entry["changes"]:
-            continue
-        header = [] if version == DEFAULT_VER else [version]
-        lines.append("\n".join(header + [f"- {c}" for c in entry["changes"]]))
+        version = entry["version"]
+        changes = entry["changes"]
 
-    content: str = "\n\n".join(lines) + "\n"
+        valid_version = version_tools.parse_version(version)
+        ver_label = version if valid_version else DEFAULT_VER
+
+        section = [ver_label] if ver_label != DEFAULT_VER else []
+        section += [f"- {change}" for change in changes]
+        changelog.append("\n".join(section))
+
+    content: str = "\n\n".join(changelog) + "\n"
 
     with file.open("w", encoding="utf-8") as f:
-        f.write(content)
-
-    _utils.logger.info(f"File generated at: {file}")
+        f.write(content.strip())
