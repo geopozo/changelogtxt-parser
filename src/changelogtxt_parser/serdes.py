@@ -12,8 +12,12 @@ def load(file_path: str) -> list[version_tools.VersionEntry]:
     """
     Parse a changelog file and returns a list of version entries.
 
-    :param file_path: Path to the file where the changelog will be read.
-    :return: a list of VersionEntry with changelog data
+    Args:
+        file_path: Path to the file where the changelog will be read.
+
+    Returns:
+        A list of `VersionEntry` with changelog data
+
     """
     file = _utils.resolve_path(file_path)
 
@@ -58,9 +62,11 @@ def dump(
 
     Each entry in the changelog includes a version string and a list of changes.
 
-    :param entries: A list of VersionEntry objects, each containing a version
-    string and associated changes.
-    :param file_path: Path to the file where the changelog will be written.
+    Args:
+        entries: A list of `VersionEntry` objects, each containing a version
+            string and associated changes.
+        file_path: Path to the file where the changelog will be written.
+
     """
     file = _utils.resolve_path(file_path, touch=True)
 

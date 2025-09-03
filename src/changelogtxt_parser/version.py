@@ -90,26 +90,30 @@ class BadVersion:
 _VersionTypes = semver.Version | pyversion.Version | BadVersion | None
 
 
-def parse_version(content: str) -> _VersionTypes:
+def parse_version(version: str) -> _VersionTypes:
     """
     Parse a version string using multiple versioning libraries.
 
-    :return: a parsed version object from one of the supported libraries, or
-    `None` if parsing fails.
+    Args:
+        version: The version to validate (e.g., "1.2.3" or "v1.2.3")
+
+    Returns:
+            A parsed version object from one of the supported libraries, or
+            `None` if parsing fails.
 
     """
-    content = content.removeprefix("v")
+    version = version.removeprefix("v")
     v: _VersionTypes = None
     try:
-        v = pyversion.Version(content)
+        v = pyversion.Version(version)
     except pyversion.InvalidVersion:
         pass
     try:
-        v = semver.Version.parse(content)
+        v = semver.Version.parse(version)
     except ValueError:
         pass
     try:
-        v = BadVersion(content)
+        v = BadVersion(version)
     except ValueError:
         pass
     if not v:

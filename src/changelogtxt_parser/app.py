@@ -41,9 +41,13 @@ def check_tag(tag: str, file_path: str) -> None:
     """
     Validate whether a given version tag exists in the changelog file.
 
-    :param tag: The version tag to validate (e.g., "1.2.3" or "v1.2.3").
-    :param file_path: Path to the changelog file to search within.
-    :raises ValueError: If the specified tag is not found in the changelog.
+    Args:
+        tag: The version tag to validate (e.g., "1.2.3" or "v1.2.3").
+        file_path: Path to the changelog file to search within.
+
+    Raises:
+        ValueError: If the specified tag is not found in the changelog.
+
     """
     entries = serdes.load(file_path)
     target_ver = version_tools.parse_version(tag)
@@ -68,10 +72,14 @@ def compare_files(
     """
     Compare two changelog files to detect version or change differences.
 
-    :param source_file_path: Path to the original changelog file.
-    :param target_file_path: Path to the updated changelog file to compare against.
-    :return: A list of VersionEntry representing the differences found,
-             or an empty list if the files are equivalent.
+    Args:
+        source_file_path: Path to the original changelog file.
+        target_file_path: Path to the updated changelog file to compare against.
+
+    Returns:
+        A list of VersionEntry representing the differences found,
+            or an empty list if the files are equivalent.
+
     """
     src_file = serdes.load(source_file_path)
     trg_file = serdes.load(target_file_path)
