@@ -8,9 +8,14 @@ from changelogtxt_parser import version as version_tools
 DEFAULT_VER = "Unreleased"
 
 
-def load(path: str) -> list[version_tools.VersionEntry]:
-    """Parse a changelog file and returns a list of version entries."""
-    file = _utils.resolve_path(path)
+def load(file_path: str) -> list[version_tools.VersionEntry]:
+    """
+    Parse a changelog file and returns a list of version entries.
+
+    :param file_path: Path to the file where the changelog will be read.
+    :return: a list of VersionEntry with changelog data
+    """
+    file = _utils.resolve_path(file_path)
 
     with file.open("r", encoding="utf-8") as f:
         changelog: list[version_tools.VersionEntry] = [
@@ -44,9 +49,20 @@ def load(path: str) -> list[version_tools.VersionEntry]:
     return changelog
 
 
-def dump(entries: list[version_tools.VersionEntry], path: str) -> None:
-    """Write a formatted changelog to the specified file path."""
-    file = _utils.resolve_path(path, touch=True)
+def dump(
+    entries: list[version_tools.VersionEntry],
+    file_path: str,
+) -> None:
+    """
+    Write a formatted changelog to the specified file path.
+
+    Each entry in the changelog includes a version string and a list of changes.
+
+    :param entries: A list of VersionEntry objects, each containing a version
+    string and associated changes.
+    :param file_path: Path to the file where the changelog will be written.
+    """
+    file = _utils.resolve_path(file_path, touch=True)
 
     changelog = []
     for entry in entries:
