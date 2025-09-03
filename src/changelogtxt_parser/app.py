@@ -3,7 +3,7 @@
 from changelogtxt_parser import _utils, serdes
 from changelogtxt_parser import version as version_tools
 
-DEFAULT_VER = "Unreleased"
+DEFAULT_VER = "unreleased"
 
 
 def update(

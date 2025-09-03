@@ -5,7 +5,7 @@ from __future__ import annotations
 from changelogtxt_parser import _utils
 from changelogtxt_parser import version as version_tools
 
-DEFAULT_VER = "Unreleased"
+DEFAULT_VER = "unreleased"
 
 
 def load(file_path: str) -> list[version_tools.VersionEntry]:
