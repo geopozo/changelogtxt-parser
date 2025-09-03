@@ -90,6 +90,12 @@ class BadVersion:
 _VersionTypes = semver.Version | pyversion.Version | BadVersion | None
 
 
+# Crea con hypothesis versions aleatorias en formato vx.x.x y
+# verifica la salida.
+# Casos de prueba:
+# * Que una version con `vx.x.x` retorne `x.x.x`
+# * Que una version some1.0* retorne `None`
+# * Que una version vx.x.xraf1 retorne `BadVersion`
 def parse_version(version: str) -> _VersionTypes:
     """
     Parse a version string using multiple versioning libraries.
