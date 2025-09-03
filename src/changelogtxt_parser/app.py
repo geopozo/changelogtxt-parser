@@ -61,16 +61,23 @@ def _changes_count(entries: list[version_tools.VersionEntry]) -> int:
 
 
 def compare_files(
-    source_file: str,
-    target_file: str,
+    source_file_path: str,
+    target_file_path: str,
 ) -> list[version_tools.VersionEntry]:
-    """Compare two changelog files to detect version or change differences."""
-    src_file = serdes.load(source_file)
-    trg_file = serdes.load(target_file)
-    src_changes = _changes_count(src_file)
-    trg_changes = _changes_count(trg_file)
+    """
+    Compare two changelog files to detect version or change differences.
 
-    if len(src_file) != len(trg_file) or src_changes != trg_changes:
+    :param source_file_path: Path to the original changelog file.
+    :param target_file_path: Path to the updated changelog file to compare against.
+    :return: A list of VersionEntry representing the differences found,
+             or an empty list if the files are equivalent.
+    """
+    src_file = serdes.load(source_file_path)
+    trg_file = serdes.load(target_file_path)
+    src_count_changes = _changes_count(src_file)
+    trg_count_changes = _changes_count(trg_file)
+
+    if len(src_file) != len(trg_file) or src_count_changes != trg_count_changes:
         return _utils.get_diffs(src_file, trg_file)
 
     return []
