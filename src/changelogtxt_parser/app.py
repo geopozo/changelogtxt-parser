@@ -9,32 +9,52 @@ DEFAULT_VER = "unreleased"
 def update(
     version: str,
     message: str,
-    path: str,
+    file_path: str,
     *,
     force=False,
 ) -> None:
     """
-    Add a new change message to the specified version in the changelog file.
+    Create a new version entry if it doesn't exist.
 
-    Creates a new version entry if it doesn't exist.
+    Args:
+        version: Version identifier to update or create in the changelog.
+        message: Change message to add under the specified version.
+        file_path: Path to the changelog file to be updated.
+        force: If True, allows adding changes to an existing version.
+            Defaults to False.
+
+    Raises:
+        ValueError: If parsing version fails.
+        ValueError: If attempting to adding changes to an existing version without
+            force.
+
     """
-    if not message:
-        raise ValueError("Message must not be empty.")
+    version = version.lower()
+    if version == DEFAULT_VER:
+        new_version = version
+        force = True
+    elif not (new_version := version_tools.parse_version(version)):
+        raise ValueError(f"Poorly formatted version value {version}")
 
-    new_version = str(version_tools.parse_version(version) or DEFAULT_VER)
-    entries = serdes.load(path)
-
+    entries = serdes.load(file_path)
     for entry in entries:
-        if new_version == entry["version"]:
-            if force or new_version == DEFAULT_VER:
-                entry["changes"].append(message)
-                break
-            else:
+        if str(new_version) == entry["version"]:
+            if not force:
                 raise ValueError("Cannot overwrite an existing version.")
+            current_changes = entry["changes"]
+            break
     else:
-        entries.insert(1, {"version": f"v{new_version}", "changes": [message]})
-
-    serdes.dump(entries, path)
+        entries.insert(
+            0,
+            {
+                "version": f"v{new_version!s}",
+                "changes": entries.pop(0)["changes"],
+            },
+        )
+        current_changes = entries[0]["changes"]
+    if message:
+        current_changes.insert(0, message)
+    serdes.dump(entries, file_path)
 
 
 def check_tag(tag: str, file_path: str) -> None:
