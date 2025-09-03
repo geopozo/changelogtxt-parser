@@ -11,7 +11,14 @@ from packaging import version as pyversion
 
 
 class VersionEntry(TypedDict):
-    """Changelog entry with a version identifier and a list of changes."""
+    """
+    Represents a single changelog entry.
+
+    Attributes:
+        version (str): The version number or tag associated with the changes.
+        changes (list[str]): A list of change descriptions for the specified version.
+
+    """
 
     version: str
     changes: list[str]
@@ -84,7 +91,13 @@ _VersionTypes = semver.Version | pyversion.Version | BadVersion | None
 
 
 def parse_version(content: str) -> _VersionTypes:
-    """Attempt to parse a version string using multiple versioning libraries."""
+    """
+    Parse a version string using multiple versioning libraries.
+
+    :return: a parsed version object from one of the supported libraries, or
+    `None` if parsing fails.
+
+    """
     content = content.removeprefix("v")
     v: _VersionTypes = None
     try:
