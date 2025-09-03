@@ -37,18 +37,19 @@ def update(
     serdes.dump(entries, path)
 
 
-def check_tag(tag: str, path: str = "./") -> None:
+def check_tag(tag: str, file_path: str) -> None:
     """
     Validate whether a given version tag exists in the changelog file.
 
-    Prefixes the tag with 'v' if missing.
+    :param tag: The version tag to validate (e.g., "1.2.3" or "v1.2.3").
+    :param file_path: Path to the changelog file to search within.
+    :raises ValueError: If the specified tag is not found in the changelog.
     """
-    if not tag.startswith("v"):
-        tag = f"v{tag}"
-
-    entries = serdes.load(path)
+    entries = serdes.load(file_path)
+    target_ver = version_tools.parse_version(tag)
     for entry in entries:
-        if entry["version"] == tag:
+        current_ver = version_tools.parse_version(entry["version"])
+        if current_ver == target_ver:
             return
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
