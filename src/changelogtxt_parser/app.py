@@ -78,13 +78,6 @@ def check_tag(tag: str, file_path: str) -> None:
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 
-def _changes_count(entries: list[version_tools.VersionEntry]) -> int:
-    for entry in entries:
-        if entry["version"] == DEFAULT_VER:
-            return len(entry["changes"])
-    return 0
-
-
 def compare_files(
     source_file_path: str,
     target_file_path: str,
@@ -103,10 +96,5 @@ def compare_files(
     """
     src_file = serdes.load(source_file_path)
     trg_file = serdes.load(target_file_path)
-    src_count_changes = _changes_count(src_file)
-    trg_count_changes = _changes_count(trg_file)
 
-    if len(src_file) != len(trg_file) or src_count_changes != trg_count_changes:
-        return _utils.get_diffs(src_file, trg_file)
-
-    return []
+    return _utils.get_diffs(src_file, trg_file)
