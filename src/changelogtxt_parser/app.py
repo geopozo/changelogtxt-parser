@@ -17,6 +17,15 @@ DEFAULT_VER = "unreleased"
 #   del archivo(unreleased) debe verificar si estan asignados en el archivo a la version
 #   pasada por arg
 # Nota: tengo dudas de si en este caso es viable usar hypothesis
+
+# Comentario:
+# Puedes usar hypothesis para generar string alreatorio, versión alreatoria.
+# Dado que las dos entradas que necesitas mas frecuentemente son 1. una version
+# 2. una bala, tendrá razón crear dos estrategias de hypothesis en conftest.py
+# que puedes reusar en cualquier prueba para hacer estás dos cosas.
+#
+# Crea una tabla de todos estados en el tablero, toda lista de posibilidades,
+# combinaciónes de arguments, etc.
 def update(
     version: str,
     message: str,
@@ -76,6 +85,7 @@ def update(
 #   retorno sea None
 # * Pasar un arg `tag` que no exista en el archivo y verificar que saque error
 # Nota: tengo dudas de si en este caso es viable usar hypothesis
+# puedes pero no se si importa?
 def check_tag(tag: str, file_path: str) -> None:
     """
     Validate whether a given version tag exists in the changelog file.
@@ -101,6 +111,9 @@ def check_tag(tag: str, file_path: str) -> None:
 # Casos de prueba:
 # * Pasar las dos changelog iguales y verificar que retorne `[]`
 # * Pasar dos changelog diferentes y verificar que retorne len(list) > 0
+# Está descripción no es completa. Cuales son los ingresos y cuales son las
+# salidas posibles. Es decir, en que sentido puede ser iguales. Y para dos
+# changelog iguales, des comparar changelogs de extremos. Otra vez, tabla.
 def compare_files(
     source_file_path: str,
     target_file_path: str,

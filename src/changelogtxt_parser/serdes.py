@@ -7,6 +7,9 @@ from changelogtxt_parser import version as version_tools
 
 DEFAULT_VER = "unreleased"
 
+# yo veo una lista de ejemplos buenos (tal vez no completo?) pero ya como vas a
+# estructurar las pruebas (lo de chat gpt)
+
 
 # Crea data mock de texto plano para llenar un tmp(del fixture)
 #   lo paso a load(tmp) y verifico que la salida coincida con

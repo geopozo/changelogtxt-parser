@@ -96,6 +96,8 @@ _VersionTypes = semver.Version | pyversion.Version | BadVersion | None
 # * Que una version con `vx.x.x` retorne `x.x.x`
 # * Que una version some1.0* retorne `None`
 # * Que una version vx.x.xraf1 retorne `BadVersion`
+# Pregunta primera: esta no esta verificada en gh-helper? Sería error mio.
+# Charla: empezamo con una lista de versiones y buscamos parametrización
 def parse_version(version: str) -> _VersionTypes:
     """
     Parse a version string using multiple versioning libraries.
