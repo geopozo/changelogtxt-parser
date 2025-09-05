@@ -23,7 +23,7 @@ def version_strings():
 @pytest.fixture(scope="session")
 def random_string():
     return st.text(
-        alphabet=st.characters(whitelist_categories=("Ll", "Lu", "And")),
+        alphabet=st.characters(whitelist_categories=("Ll", "Lu", "Nd")),
         min_size=8,
         max_size=16,
     )
