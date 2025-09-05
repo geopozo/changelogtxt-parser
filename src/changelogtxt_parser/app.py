@@ -6,26 +6,39 @@ from changelogtxt_parser import version as version_tools
 DEFAULT_VER = "unreleased"
 
 
-# Crea data mock de un changelog tmp(fixture) para file path:
-# Casos de prueba:
-# * Pasar un arg de una version que exista en el archivo y verificar el `ValueError`
-# * Pasar el arg `force` si puede agregar un punto a una versión ya existente y
-# verificar el archivo.
-# * Pasar en str de `unreleased` como arg de version y el arg `message` para agregar
-#   un nuevo punto en el header del archivo.
-# * Pasar un arg de una `version` que no existe un tmp(fixture) con puntos en el header
-#   del archivo(unreleased) debe verificar si estan asignados en el archivo a la version
-#   pasada por arg
-# Nota: tengo dudas de si en este caso es viable usar hypothesis
+# Claude,
+# * Crea una strategia de hypothesis para la generación de string alreatorio `changes`,
+#       unica y exlusivamente para las pruebas que usen message.
+# * Usar el fixture de tmp file de pytest para las pruebas que usen file_path.
+# * Arreglar la data del tmp fixture para que coincida con las pruebas.
 
-# Comentario:
-# Puedes usar hypothesis para generar string alreatorio, versión alreatoria.
-# Dado que las dos entradas que necesitas mas frecuentemente son 1. una version
-# 2. una bala, tendrá razón crear dos estrategias de hypothesis en conftest.py
-# que puedes reusar en cualquier prueba para hacer estás dos cosas.
-#
-# Crea una tabla de todos estados en el tablero, toda lista de posibilidades,
-# combinaciónes de arguments, etc.
+
+#   update():
+#      1) Si envia arg `version` y es nueva debe agregarla y verificar que
+#          esta en el archivo.
+#      2) Si envia arg `version` y es nueva y envia arg `message` debe agregar
+#          la versiòn y la `bullet` con el texto del mensaje.
+#      3) Si envia arg `version` y es nueva y hay `changes` en `unreleased` debe
+#          agregar la version nueva y sumarle los `changes` de `unreleased` a esa
+#          version.
+#      4) Si envia arg `version` y es nueva y envia arg `message` y hay `changes`
+#          en `unreleased` debe agregar la vesion nueva, sumarle los `changes` de
+#          `unreleased` a esa version y el `message` verificar que esa en primera
+#          posición.
+#      5) Si envia arg `version` y ya existe en el archivo debe validar que salga
+#          el ValueError.
+#      6) Si envia arg `version` y ya existe en el archivo y envia el arg `force`
+#          debe validar que salga un ValueError porque no agregara nada nuevo.
+#      7) Si envia arg `version` y ya existe en el archivo y envia el arg `force`
+#          y envia el arg `message`, y no hay `changes` en esa version debe agregar
+#          el `message` a esa version como un nuevo `changes`.
+#      8) Si envia arg `version` y ya existe en el archivo y envia el arg `force`
+#          y envia el arg `message`, y hay `changes` en esa version debe agregar
+#          el `message` a esa version en la primera posición.
+#      9) Si envia arg `version`y es igual a `unreleased` y no hay mas `changes`
+#          debe agregar esa `bullet` a `unreleased` en el archivo.
+#      10) Si envia arg `version`y es igual a `unreleased` y hay mas `changes` debe
+#          debe agregar esa `bullet` a `unreleased` en la primera posición del archivo.
 def update(
     version: str,
     message: str,
