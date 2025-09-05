@@ -69,7 +69,7 @@ def update(
 
     entries = serdes.load(file_path)
     for entry in entries:
-        if str(new_version) == entry["version"]:
+        if str(new_version) == entry["version"].removeprefix("v"):
             if not force:
                 raise ValueError("Cannot overwrite an existing version.")
             current_changes = entry["changes"]
