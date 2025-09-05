@@ -7,8 +7,6 @@ DEFAULT_VER = "unreleased"
 
 
 # Claude,
-# * Crea una strategia de hypothesis para la generación de string alreatorio `changes`,
-#       unica y exlusivamente para las pruebas que usen message.
 # * Usar el fixture de tmp file de pytest para las pruebas que usen file_path.
 # * Arreglar la data del tmp fixture para que coincida con las pruebas.
 
@@ -114,23 +112,19 @@ def check_tag(tag: str, file_path: str) -> None:
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 
-# Crea data mock de dos tmp(fixture) para source y target file path:
-# * Pasar dos changelog diferentes y verificar que retorne len(list) > 0
-# Está descripción no es completa. Cuales son los ingresos y cuales son las
-# salidas posibles. Es decir, en que sentido puede set iguales. Y para dos
-# changelog iguales, des comparar changelogs de extremos. Otra vez, tabla.
-
-
 #   summarize_news():
-#       1) Si envia args `source_file_path` y `target_file_path` y el source
+#       1) Si envia args `source_file_path` y `target_file_path` y el target
 #           tiene `bullets` en unreleased(cabecera del archivo) debe verificar
-#           que retorne un list con estos dict de diferencias.
-#       2) Si envia args `source_file_path` y `target_file_path` y el source
+#           que retorne algo similar a (set(), {'unreleased': {'new change'}}).
+#       2) Si envia args `source_file_path` y `target_file_path` y el target
 #           tiene no `bullets` en unreleased(cabecera del archivo) ni version
-#           nueva debe verificar que retorne un list vacio.
-#       3) Si envia args `source_file_path` y `target_file_path` y el source
-#           tiene una version nueva debe verificar que retorne un list con estos
-#           dict de version de diferencias.
+#           nueva debe verificar que retorne un (set(), {}).
+#       3) Si envia args `source_file_path` y `target_file_path` y el target
+#           tiene una version nueva debe verificar que retorne algo similar
+#           ({'v1.0.2'}, {}).
+#       4) Si envia args `source_file_path` y `target_file_path` y el target
+#           tiene una version nueva y tiene `bullets` en unreleased debe verificar
+#           que retorne algo similar a ({'v1.0.2'}, {'unreleased': {'new change'}})
 def summarize_news(
     source_file_path: str,
     target_file_path: str,
