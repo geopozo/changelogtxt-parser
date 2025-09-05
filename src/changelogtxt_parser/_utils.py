@@ -1,14 +1,12 @@
-import json
 import logging
 import os
 import pathlib
-from typing import Any
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
-# casos corectos pero dadas mis dudas de la funcion seguiente, tengo que enter
+# casos correctos pero dadas las dudas de la function seguiente, tengo que enter
 # un poco mejor esto.
 # Crea data mock y pasa a resolve_path(tmp) y que retorne el objeto de `Path` de
 #   Path() correcta
@@ -50,17 +48,3 @@ def find_file(path: str = "./") -> str:
                 logger.info(f"File found in: {file_path}")
                 return file_path
     raise FileNotFoundError(f"{filename} file not found in the specified path.")
-
-
-# Crea data mock de dos list[dict]
-# Casos de prueba:
-# * Pasar las dos listas iguales y verificar que retorne []
-# * Pasar ambas con alguna diferencia y retorne una lista con
-#   los dict diferentes.
-
-# todavía tengo dudas sobre esto, postergamos esta prueba.
-def get_diffs(source: list[Any], target: list[Any]) -> list[Any]:
-    set1 = {json.dumps(entry, sort_keys=True) for entry in source}
-    set2 = {json.dumps(entry, sort_keys=True) for entry in target}
-    diffs = [json.loads(diff) for diff in list(set1.symmetric_difference(set2))]
-    return diffs
