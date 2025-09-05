@@ -1,6 +1,6 @@
 """App ChangelogTXT Module."""
 
-from changelogtxt_parser import _utils, serdes
+from changelogtxt_parser import serdes
 from changelogtxt_parser import version as version_tools
 
 DEFAULT_VER = "unreleased"
@@ -22,7 +22,7 @@ DEFAULT_VER = "unreleased"
 #          agregar la version nueva y sumarle los `changes` de `unreleased` a esa
 #          version.
 #      4) Si envia arg `version` y es nueva y envia arg `message` y hay `changes`
-#          en `unreleased` debe agregar la vesion nueva, sumarle los `changes` de
+#          en `unreleased` debe agregar la version nueva, sumarle los `changes` de
 #          `unreleased` a esa version y el `message` verificar que esa en primera
 #          posición.
 #      5) Si envia arg `version` y ya existe en el archivo debe validar que salga
@@ -115,16 +115,26 @@ def check_tag(tag: str, file_path: str) -> None:
 
 
 # Crea data mock de dos tmp(fixture) para source y target file path:
-# Casos de prueba:
-# * Pasar las dos changelog iguales y verificar que retorne `[]`
 # * Pasar dos changelog diferentes y verificar que retorne len(list) > 0
 # Está descripción no es completa. Cuales son los ingresos y cuales son las
-# salidas posibles. Es decir, en que sentido puede ser iguales. Y para dos
+# salidas posibles. Es decir, en que sentido puede set iguales. Y para dos
 # changelog iguales, des comparar changelogs de extremos. Otra vez, tabla.
-def compare_files(
+
+
+#   summarize_news():
+#       1) Si envia args `source_file_path` y `target_file_path` y el source
+#           tiene `bullets` en unreleased(cabecera del archivo) debe verificar
+#           que retorne un list con estos dict de diferencias.
+#       2) Si envia args `source_file_path` y `target_file_path` y el source
+#           tiene no `bullets` en unreleased(cabecera del archivo) ni version
+#           nueva debe verificar que retorne un list vacio.
+#       3) Si envia args `source_file_path` y `target_file_path` y el source
+#           tiene una version nueva debe verificar que retorne un list con estos
+#           dict de version de diferencias.
+def summarize_news(
     source_file_path: str,
     target_file_path: str,
-) -> list[version_tools.VersionEntry]:
+) -> tuple[set[str], dict[str, list[str]]]:
     """
     Compare two changelog files to detect version or change differences.
 
@@ -133,11 +143,20 @@ def compare_files(
         target_file_path: Path to the updated changelog file to compare against.
 
     Returns:
-        A list of VersionEntry representing the differences found,
-            or an empty list if the files are equivalent.
+        A list of tuple[set[str], dict[str, list[str]]] representing the differences
+        found, or an empty list if the files are equivalent.
 
     """
-    src_file = serdes.load(source_file_path)
-    trg_file = serdes.load(target_file_path)
+    src = serdes.load(source_file_path)
+    trg = serdes.load(target_file_path)
 
-    return _utils.get_diffs(src_file, trg_file)
+    src_dict = {entry["version"]: entry["changes"] for entry in src}
+    trg_dict = {entry["version"]: entry["changes"] for entry in trg}
+
+    new_versions = trg_dict.keys() - src_dict.keys()
+    new_changes = {}
+    for v in src_dict.keys() & trg_dict.keys():
+        if c := set(trg_dict[v]) - set(src_dict[v]):
+            new_changes[v] = c
+
+    return new_versions, new_changes
