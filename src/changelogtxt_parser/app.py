@@ -128,7 +128,7 @@ def check_tag(tag: str, file_path: str) -> None:
 def summarize_news(
     source_file_path: str,
     target_file_path: str,
-) -> tuple[set[str], dict[str, list[str]]]:
+) -> tuple[set[str], dict[str, set[str]]]:
     """
     Compare two changelog files to detect version or change differences.
 
