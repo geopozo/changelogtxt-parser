@@ -90,15 +90,9 @@ def update(
     serdes.dump(entries, file_path)
 
 
-# Crea data mock de un changelog tmp(fixture) para file path:
-# Casos de prueba:
-# * Pasar un arg tag que exista que inicie con `v` y verificar que el retorno
-#   sea None
-# * Pasar un arg tag que exista que no inicie con `v` y verificar que el
-#   retorno sea None
-# * Pasar un arg `tag` que no exista en el archivo y verificar que saque error
-# Nota: tengo dudas de si en este caso es viable usar hypothesis
-# puedes pero no se si importa?
+#   check_tag():
+#       1) Si envia arg `tag` y existe verificar el retorno `None`
+#       2) Si envia arg `tag` que no existe debe verificar el ValueError
 def check_tag(tag: str, file_path: str) -> None:
     """
     Validate whether a given version tag exists in the changelog file.
