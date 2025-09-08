@@ -1,12 +1,7 @@
 import pytest
 from hypothesis import strategies as st
 
-CHANGELOG_CONTENT = """v1.0.1
-- Fixed bug in parser
-
-v1.0.0
-- Initial release
-"""
+CHANGELOG_CONTENT = "v1.0.1\n- Fixed bug\n\nv1.0.0\n- Initial release"
 
 
 @pytest.fixture(scope="session")
