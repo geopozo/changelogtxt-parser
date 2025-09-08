@@ -36,6 +36,20 @@ def list_of_strings(random_string):
     return st.lists(random_string, min_size=2, max_size=10, unique=True)
 
 
+@pytest.fixture(scope="session")
+def list_of_version_entries(version_strings, random_string):
+    return st.lists(
+        st.builds(
+            lambda version, change: {"version": version, "changes": [change]},
+            version=version_strings,
+            change=random_string,
+        ),
+        min_size=2,
+        max_size=10,
+        unique_by=lambda entry: str(entry["version"]),
+    )
+
+
 @pytest.fixture
 def changelog_tmp(tmp_path):
     path = tmp_path / "CHANGELOG.txt"
