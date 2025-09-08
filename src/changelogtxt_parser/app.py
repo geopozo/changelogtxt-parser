@@ -6,37 +6,6 @@ from changelogtxt_parser import version as version_tools
 DEFAULT_VER = "unreleased"
 
 
-# Claude,
-# * Usar el fixture de tmp file de pytest para las pruebas que usen file_path.
-# * Arreglar la data del tmp fixture para que coincida con las pruebas.
-
-
-#   update():
-#      1) Si envia arg `version` y es nueva debe agregarla y verificar que
-#          esta en el archivo.
-#      2) Si envia arg `version` y es nueva y envia arg `message` debe agregar
-#          la versiòn y la `bullet` con el texto del mensaje.
-#      3) Si envia arg `version` y es nueva y hay `changes` en `unreleased` debe
-#          agregar la version nueva y sumarle los `changes` de `unreleased` a esa
-#          version.
-#      4) Si envia arg `version` y es nueva y envia arg `message` y hay `changes`
-#          en `unreleased` debe agregar la version nueva, sumarle los `changes` de
-#          `unreleased` a esa version y el `message` verificar que esa en primera
-#          posición.
-#      5) Si envia arg `version` y ya existe en el archivo debe validar que salga
-#          el ValueError.
-#      6) Si envia arg `version` y ya existe en el archivo y envia el arg `force`
-#          debe validar que salga un ValueError porque no agregara nada nuevo.
-#      7) Si envia arg `version` y ya existe en el archivo y envia el arg `force`
-#          y envia el arg `message`, y no hay `changes` en esa version debe agregar
-#          el `message` a esa version como un nuevo `changes`.
-#      8) Si envia arg `version` y ya existe en el archivo y envia el arg `force`
-#          y envia el arg `message`, y hay `changes` en esa version debe agregar
-#          el `message` a esa version en la primera posición.
-#      9) Si envia arg `version`y es igual a `unreleased` y no hay mas `changes`
-#          debe agregar esa `bullet` a `unreleased` en el archivo.
-#      10) Si envia arg `version`y es igual a `unreleased` y hay mas `changes` debe
-#          debe agregar esa `bullet` a `unreleased` en la primera posición del archivo.
 def update(
     version: str,
     message: str,
@@ -88,9 +57,6 @@ def update(
     serdes.dump(entries, file_path)
 
 
-#   check_tag():
-#       1) Si envia arg `tag` y existe verificar el retorno `None`
-#       2) Si envia arg `tag` que no existe debe verificar el ValueError
 def check_tag(tag: str, file_path: str) -> None:
     """
     Validate whether a given version tag exists in the changelog file.
