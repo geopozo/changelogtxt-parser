@@ -21,11 +21,11 @@ class TestCheckTag:
         version_strings,
         random_string,
     ):
-        version = data.draw(version_strings).removeprefix("v")
+        version = data.draw(version_strings)
         message = data.draw(random_string)
-        app.update(version, message, changelog_tmp)
         assume(version not in ASSUME_LIST)
 
+        app.update(version, message, changelog_tmp)
         result = app.check_tag(version, str(changelog_tmp))
 
         assert result is None
