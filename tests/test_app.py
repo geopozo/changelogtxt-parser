@@ -193,3 +193,77 @@ class TestUpdate:
     ):
         with pytest.raises(ValueError, match="Poorly formatted version value"):
             app.update("rc1.0.1fr", "test message", str(changelog_tmp))
+
+
+class TestSummarizeNews:
+    def test_summarize_news_target_has_unreleased_changes(self, tmp_path):
+        source_file = tmp_path / "source.txt"
+        target_file = tmp_path / "target.txt"
+        source_file.write_text(CHANGELOG_CONTENT)
+        target_file.write_text(CHANGELOG_CONTENT)
+
+        app.update("unreleased", "New change", str(target_file))
+        new_versions, new_changes = app.summarize_news(
+            str(source_file),
+            str(target_file),
+        )
+
+        assert new_versions == set()
+        assert "unreleased" in new_changes
+        assert "New change" in new_changes["unreleased"]
+
+    def test_summarize_news_no_changes(self, tmp_path):
+        source_file = tmp_path / "source.txt"
+        target_file = tmp_path / "target.txt"
+        source_file.write_text(CHANGELOG_CONTENT)
+        target_file.write_text(CHANGELOG_CONTENT)
+
+        new_versions, new_changes = app.summarize_news(
+            str(source_file),
+            str(target_file),
+        )
+
+        assert new_versions == set()
+        assert new_changes == {}
+
+    @BASE_SETTINGS
+    @given(data=st.data())
+    def test_summarize_news_new_version(
+        self,
+        data,
+        tmp_path,
+        version_strings,
+        random_string,
+    ):
+        source_file = tmp_path / "source.txt"
+        target_file = tmp_path / "target.txt"
+        source_file.write_text(CHANGELOG_CONTENT)
+        target_file.write_text(CHANGELOG_CONTENT)
+
+        version = data.draw(version_strings)
+        message = data.draw(random_string)
+        assume(version not in ASSUME_LIST)
+
+        app.update(version, message, str(target_file))
+
+        new_versions, new_changes = app.summarize_news(
+            str(source_file),
+            str(target_file),
+        )
+
+        assert version in new_versions
+        assert new_changes == {}
+
+    def test_summarize_news_new_unreleased_changes(
+        self,
+        tmp_path,
+    ):
+        source_file = tmp_path / "source.txt"
+        target_file = tmp_path / "target.txt"
+        source_file.write_text(CHANGELOG_CONTENT)
+        target_file.write_text(CHANGELOG_CONTENT)
+
+        app.update("unreleased", "New change", str(target_file))
+
+        _, new_changes = app.summarize_news(str(source_file), str(target_file))
+        assert "New change" in new_changes["unreleased"]
