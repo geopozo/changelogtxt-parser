@@ -78,19 +78,6 @@ def check_tag(tag: str, file_path: str) -> None:
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 
-#   summarize_news():
-#       1) Si envia args `source_file_path` y `target_file_path` y el target
-#           tiene `bullets` en unreleased(cabecera del archivo) debe verificar
-#           que retorne algo similar a (set(), {'unreleased': {'new change'}}).
-#       2) Si envia args `source_file_path` y `target_file_path` y el target
-#           tiene no `bullets` en unreleased(cabecera del archivo) ni version
-#           nueva debe verificar que retorne un (set(), {}).
-#       3) Si envia args `source_file_path` y `target_file_path` y el target
-#           tiene una version nueva debe verificar que retorne algo similar
-#           ({'v1.0.2'}, {}).
-#       4) Si envia args `source_file_path` y `target_file_path` y el target
-#           tiene una version nueva y tiene `bullets` en unreleased debe verificar
-#           que retorne algo similar a ({'v1.0.2'}, {'unreleased': {'new change'}})
 def summarize_news(
     source_file_path: str,
     target_file_path: str,
