@@ -17,7 +17,7 @@ BASE_SETTINGS = settings(
     max_examples=20,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
 )
-ASSUME_LIST = ["v1.0.1", "v1.0.0", "1.0.1", "1.0.0", "0.0.0"]
+ASSUME_LIST = ["v1.0.1", "v1.0.0"]
 
 
 @pytest.fixture
@@ -49,7 +49,7 @@ class TestCheckTag:
     @BASE_SETTINGS
     @given(data=st.data())
     def test_check_tag_non_existing(self, data, changelog_tmp, version_strings):
-        tag = data.draw(version_strings).removeprefix("v")
+        tag = data.draw(version_strings)
         assume(tag not in ASSUME_LIST)
 
         with pytest.raises(
@@ -69,7 +69,7 @@ class TestUpdate:
         version_strings,
         random_string,
     ):
-        version = data.draw(version_strings).removeprefix("v")
+        version = data.draw(version_strings)
         message = data.draw(random_string)
         assume(version not in ASSUME_LIST)
 
@@ -90,7 +90,7 @@ class TestUpdate:
         version_strings,
         random_string,
     ):
-        version = data.draw(version_strings).removeprefix("v")
+        version = data.draw(version_strings)
         message = data.draw(random_string)
         assume(version not in ASSUME_LIST)
 
@@ -112,7 +112,7 @@ class TestUpdate:
         version_strings,
         random_string,
     ):
-        version = data.draw(version_strings).removeprefix("v")
+        version = data.draw(version_strings)
         message = data.draw(random_string)
         assume(version not in ASSUME_LIST)
 
@@ -125,14 +125,14 @@ class TestUpdate:
 
     def test_update_existing_version_raises_error(self, changelog_tmp):
         with pytest.raises(ValueError, match="Cannot overwrite an existing version."):
-            app.update("1.0.1", "New change", str(changelog_tmp))
+            app.update("v1.0.1", "New change", str(changelog_tmp))
 
     def test_update_existing_version_with_force_no_message_allows_update(
         self,
         changelog_tmp,
     ):
         message = "New change"
-        app.update("1.0.1", message, str(changelog_tmp), force=True)
+        app.update("v1.0.1", message, str(changelog_tmp), force=True)
         updated_file = changelog_tmp.read_text(encoding="utf-8")
         second_line = updated_file.splitlines()[1]
 
@@ -148,7 +148,7 @@ class TestUpdate:
         version_strings,
         random_string,
     ):
-        version = data.draw(version_strings).removeprefix("v")
+        version = data.draw(version_strings)
         message = data.draw(random_string)
         assume(version not in ASSUME_LIST)
 
@@ -168,7 +168,7 @@ class TestUpdate:
         version_strings,
         random_string,
     ):
-        version = data.draw(version_strings).removeprefix("v")
+        version = data.draw(version_strings)
         message = data.draw(random_string)
         assume(version not in ASSUME_LIST)
 
