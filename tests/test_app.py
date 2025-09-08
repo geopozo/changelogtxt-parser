@@ -13,7 +13,6 @@ v1.0.0
 - Initial release
 """
 
-DEFAULT_FILE = "CHANGELOG.txt"
 BASE_SETTINGS = settings(
     max_examples=20,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
@@ -22,10 +21,10 @@ ASSUME_LIST = ["v1.0.1", "v1.0.0", "1.0.1", "1.0.0"]
 
 
 @pytest.fixture
-def changelog_path(tmp_path):
-    p = tmp_path / DEFAULT_FILE
-    p.write_text(CHANGELOG_CONTENT)
-    return p
+def changelog_tmp(tmp_path):
+    path = tmp_path / "CHANGELOG.txt"
+    path.write_text(CHANGELOG_CONTENT)
+    return path
 
 
 class TestCheckTag:
@@ -34,21 +33,22 @@ class TestCheckTag:
     def test_check_tag_existing(
         self,
         data,
-        changelog_path,
+        changelog_tmp,
         version_strings,
         random_string,
     ):
         version = data.draw(version_strings)
         message = data.draw(random_string)
-        app.update(version, message, changelog_path)
+        app.update(version, message, changelog_tmp)
         assume(version not in ASSUME_LIST)
-        result = app.check_tag(version, str(changelog_path))
+
+        result = app.check_tag(version, str(changelog_tmp))
 
         assert result is None
 
     @BASE_SETTINGS
     @given(data=st.data())
-    def test_check_tag_non_existing(self, data, changelog_path, version_strings):
+    def test_check_tag_non_existing(self, data, changelog_tmp, version_strings):
         tag = data.draw(version_strings)
         assume(tag not in ASSUME_LIST)
 
@@ -56,4 +56,4 @@ class TestCheckTag:
             ValueError,
             match=re.escape(f"Tag '{tag}' not found in changelog"),
         ):
-            app.check_tag(tag, str(changelog_path))
+            app.check_tag(tag, str(changelog_tmp))
