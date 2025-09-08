@@ -17,7 +17,7 @@ BASE_SETTINGS = settings(
     max_examples=20,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
 )
-ASSUME_LIST = ["v1.0.1", "v1.0.0", "1.0.1", "1.0.0"]
+ASSUME_LIST = ["v1.0.1", "v1.0.0", "1.0.1", "1.0.0", "0.0.0"]
 
 
 @pytest.fixture
@@ -37,7 +37,7 @@ class TestCheckTag:
         version_strings,
         random_string,
     ):
-        version = data.draw(version_strings)
+        version = data.draw(version_strings).removeprefix("v")
         message = data.draw(random_string)
         app.update(version, message, changelog_tmp)
         assume(version not in ASSUME_LIST)
@@ -49,7 +49,7 @@ class TestCheckTag:
     @BASE_SETTINGS
     @given(data=st.data())
     def test_check_tag_non_existing(self, data, changelog_tmp, version_strings):
-        tag = data.draw(version_strings)
+        tag = data.draw(version_strings).removeprefix("v")
         assume(tag not in ASSUME_LIST)
 
         with pytest.raises(
