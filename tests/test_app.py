@@ -1,5 +1,3 @@
-import re
-
 import pytest
 from hypothesis import HealthCheck, assume, given, settings
 from hypothesis import strategies as st
@@ -40,7 +38,7 @@ class TestCheckTag:
 
         with pytest.raises(
             ValueError,
-            match=re.escape(f"Tag '{tag}' not found in changelog"),
+            match=(f"Tag '{tag}' not found in changelog"),
         ):
             app.check_tag(tag, str(changelog_tmp))
 
