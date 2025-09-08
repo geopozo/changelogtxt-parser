@@ -7,7 +7,7 @@ from changelogtxt_parser import version as version_tools
 
 DEFAULT_VER = "unreleased"
 
-# yo veo una lista de ejemplos buenos (tal vez no completo?) pero ya como vas a
+# yo veo una lista de ejemplos buenos (tal vez no completo?) pero ya como was a
 # estructurar las pruebas (lo de chat gpt)
 
 
@@ -93,7 +93,9 @@ def dump(
         version = entry["version"]
         changes = entry["changes"]
 
-        section = [str(_s)] if (_s := version_tools.parse_version(version)) else []
+        section = (
+            [str(f"v{_s}")] if (_s := version_tools.parse_version(version)) else []
+        )
         section.extend([f"- {change}" for change in changes])
         changelog.append("\n".join(section))
 
