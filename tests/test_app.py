@@ -6,25 +6,11 @@ from hypothesis import strategies as st
 
 from changelogtxt_parser import app
 
-CHANGELOG_CONTENT = """v1.0.1
-- Fixed bug in parser
-
-v1.0.0
-- Initial release
-"""
-
 BASE_SETTINGS = settings(
     max_examples=20,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
 )
 ASSUME_LIST = ["v1.0.1", "v1.0.0"]
-
-
-@pytest.fixture
-def changelog_tmp(tmp_path):
-    path = tmp_path / "CHANGELOG.txt"
-    path.write_text(CHANGELOG_CONTENT)
-    return path
 
 
 class TestCheckTag:
@@ -197,10 +183,11 @@ class TestUpdate:
 
 class TestSummarizeNews:
     def test_summarize_news_target_has_unreleased_changes(self, tmp_path):
+        content = "v1.0.1\n- Fixed bug in parser"
         source_file = tmp_path / "source.txt"
         target_file = tmp_path / "target.txt"
-        source_file.write_text(CHANGELOG_CONTENT)
-        target_file.write_text(CHANGELOG_CONTENT)
+        source_file.write_text(content)
+        target_file.write_text(content)
 
         app.update("unreleased", "New change", str(target_file))
         new_versions, new_changes = app.summarize_news(
@@ -213,10 +200,11 @@ class TestSummarizeNews:
         assert "New change" in new_changes["unreleased"]
 
     def test_summarize_news_no_changes(self, tmp_path):
+        content = "v1.0.0\n- Fixed bug in parser"
         source_file = tmp_path / "source.txt"
         target_file = tmp_path / "target.txt"
-        source_file.write_text(CHANGELOG_CONTENT)
-        target_file.write_text(CHANGELOG_CONTENT)
+        source_file.write_text(content)
+        target_file.write_text(content)
 
         new_versions, new_changes = app.summarize_news(
             str(source_file),
@@ -235,10 +223,11 @@ class TestSummarizeNews:
         version_strings,
         random_string,
     ):
+        content = "v1.0.0\n- Fixed bug in parser"
         source_file = tmp_path / "source.txt"
         target_file = tmp_path / "target.txt"
-        source_file.write_text(CHANGELOG_CONTENT)
-        target_file.write_text(CHANGELOG_CONTENT)
+        source_file.write_text(content)
+        target_file.write_text(content)
 
         version = data.draw(version_strings)
         message = data.draw(random_string)
@@ -258,10 +247,11 @@ class TestSummarizeNews:
         self,
         tmp_path,
     ):
+        content = "v1.0.0\n- Fixed bug in parser"
         source_file = tmp_path / "source.txt"
         target_file = tmp_path / "target.txt"
-        source_file.write_text(CHANGELOG_CONTENT)
-        target_file.write_text(CHANGELOG_CONTENT)
+        source_file.write_text(content)
+        target_file.write_text(content)
 
         app.update("unreleased", "New change", str(target_file))
 

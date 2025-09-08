@@ -1,6 +1,13 @@
 import pytest
 from hypothesis import strategies as st
 
+CHANGELOG_CONTENT = """v1.0.1
+- Fixed bug in parser
+
+v1.0.0
+- Initial release
+"""
+
 
 @pytest.fixture(scope="session")
 def version_strings():
@@ -32,3 +39,10 @@ def random_string():
 @pytest.fixture(scope="session")
 def list_of_strings(random_string):
     return st.lists(random_string, min_size=2, max_size=10, unique=True)
+
+
+@pytest.fixture
+def changelog_tmp(tmp_path):
+    path = tmp_path / "CHANGELOG.txt"
+    path.write_text(CHANGELOG_CONTENT)
+    return path
