@@ -75,7 +75,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "-t",
         "--tag",
         help="Tag name is required.",
-        required=True,
+        required=False,
     )
     update.add_argument(
         "-m",
@@ -102,7 +102,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
 
 def run_cli() -> None:
     parser, cli_args = _get_cli_args()
-    tag = cli_args.pop("tag", None)
+    tag = cli_args.pop("tag", "")
     file = cli_args.pop("file", "")
     source_file = cli_args.pop("source", "")
     target_file = cli_args.pop("target", "")

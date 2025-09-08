@@ -80,7 +80,7 @@ class TestUpdate:
         message = data.draw(random_string)
         assume(version not in ASSUME_LIST)
 
-        app.update("unreleased", message, str(changelog_tmp))
+        app.update("", message, str(changelog_tmp))
         app.update(version, "", str(changelog_tmp))
         updated_file = changelog_tmp.read_text(encoding="utf-8")
         first_line = updated_file.splitlines()[0]
@@ -102,7 +102,7 @@ class TestUpdate:
         message = data.draw(random_string)
         assume(version not in ASSUME_LIST)
 
-        app.update("unreleased", message, str(changelog_tmp))
+        app.update("", message, str(changelog_tmp))
         app.update(version, message, str(changelog_tmp))
 
         updated_file = changelog_tmp.read_text(encoding="utf-8").splitlines()
@@ -138,7 +138,7 @@ class TestUpdate:
         message = data.draw(random_string)
         assume(version not in ASSUME_LIST)
 
-        app.update("unreleased", message, str(changelog_tmp))
+        app.update("", message, str(changelog_tmp))
         updated_file = changelog_tmp.read_text(encoding="utf-8")
         first_line = updated_file.splitlines()[0]
 
@@ -158,9 +158,9 @@ class TestUpdate:
         message = data.draw(random_string)
         assume(version not in ASSUME_LIST)
 
-        app.update("unreleased", "New feature added", str(changelog_tmp))
-        app.update("unreleased", "Performance improvements", str(changelog_tmp))
-        app.update("unreleased", message, str(changelog_tmp))
+        app.update("", "New feature added", str(changelog_tmp))
+        app.update("", "Performance improvements", str(changelog_tmp))
+        app.update("", message, str(changelog_tmp))
 
         updated_file = changelog_tmp.read_text(encoding="utf-8")
         message_index = updated_file.find(f"- {message}")
@@ -180,6 +180,20 @@ class TestUpdate:
         with pytest.raises(ValueError, match="Poorly formatted version value"):
             app.update("rc1.0.1fr", "test message", str(changelog_tmp))
 
+    def test_update_unreleased_missing_version_and_message(
+        self,
+        changelog_tmp,
+    ):
+        with pytest.raises(ValueError, match="Version already exists: Nothing to do."):
+            app.update("", "", str(changelog_tmp))
+
+    def test_update_version_missing_message(
+        self,
+        changelog_tmp,
+    ):
+        with pytest.raises(ValueError, match="Version already exists: Nothing to do."):
+            app.update("v1.0.1", "", str(changelog_tmp), force=True)
+
 
 class TestSummarizeNews:
     def test_summarize_news_target_has_unreleased_changes(self, tmp_path):
@@ -189,15 +203,14 @@ class TestSummarizeNews:
         source_file.write_text(content)
         target_file.write_text(content)
 
-        app.update("unreleased", "New change", str(target_file))
+        app.update("", "New change", str(target_file))
         new_versions, new_changes = app.summarize_news(
             str(source_file),
             str(target_file),
         )
 
         assert new_versions == set()
-        assert "unreleased" in new_changes
-        assert "New change" in new_changes["unreleased"]
+        assert "New change" in new_changes[""]
 
     def test_summarize_news_no_changes(self, tmp_path):
         content = "v1.0.0\n- Fixed bug in parser"
@@ -253,7 +266,7 @@ class TestSummarizeNews:
         source_file.write_text(content)
         target_file.write_text(content)
 
-        app.update("unreleased", "New change", str(target_file))
+        app.update("", "New change", str(target_file))
 
         _, new_changes = app.summarize_news(str(source_file), str(target_file))
-        assert "New change" in new_changes["unreleased"]
+        assert "New change" in new_changes[""]

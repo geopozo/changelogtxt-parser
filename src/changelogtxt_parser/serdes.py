@@ -5,8 +5,6 @@ from __future__ import annotations
 from changelogtxt_parser import _utils
 from changelogtxt_parser import version as version_tools
 
-DEFAULT_VER = "unreleased"
-
 # yo veo una lista de ejemplos buenos (tal vez no completo?) pero ya como was a
 # estructurar las pruebas (lo de chat gpt)
 
@@ -33,7 +31,7 @@ def load(file_path: str) -> list[version_tools.VersionEntry]:
 
     with file.open("r", encoding="utf-8") as f:
         changelog: list[version_tools.VersionEntry] = [
-            {"version": DEFAULT_VER, "changes": []},
+            {"version": "", "changes": []},
         ]
         current_entry: version_tools.VersionEntry = changelog[-1]
 

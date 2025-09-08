@@ -3,13 +3,11 @@
 from changelogtxt_parser import serdes
 from changelogtxt_parser import version as version_tools
 
-DEFAULT_VER = "unreleased"
-
 
 def update(
-    version: str,
-    message: str,
-    file_path: str,
+    version: str = "",
+    message: str = "",
+    file_path: str = "./CHANGELOG.txt",
     *,
     force=False,
 ) -> None:
@@ -30,7 +28,7 @@ def update(
 
     """
     version = version.lower()
-    if version == DEFAULT_VER:
+    if version == "":
         new_version = version
         force = True
     elif not (new_version := version_tools.parse_version(version)):
@@ -41,6 +39,8 @@ def update(
         if str(new_version) == entry["version"].removeprefix("v"):
             if not force:
                 raise ValueError("Cannot overwrite an existing version.")
+            if not message:
+                raise ValueError("Version already exists: Nothing to do.")
             current_changes = entry["changes"]
             break
     else:
