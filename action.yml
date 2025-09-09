@@ -9,7 +9,8 @@ inputs:
     default: "3.12"
   working-directory:
     description: "Directory where the command will be executed"
-    required: true
+    required: false
+    default: "."
   use-local:
     description: "Use local changelogtxt-parser instead of GitHub repo"
     required: false
@@ -30,7 +31,6 @@ runs:
   steps:
     - name: Setup uv
       uses: astral-sh/setup-uv@v5
-
     - id: format
       name: Check format
       shell: bash
