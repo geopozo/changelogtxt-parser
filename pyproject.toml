@@ -70,6 +70,7 @@ ignore = [
 
 [tool.pytest.ini_options]
 log_cli = true
+addopts = "--cov=src/changelogtxt_parser --cov-report html tests/"
 
 [tool.mypy]
 files = ["src/changelogtxt_parser"]
