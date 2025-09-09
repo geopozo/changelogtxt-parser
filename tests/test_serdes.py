@@ -2,6 +2,7 @@ import pytest
 from hypothesis import HealthCheck, given, settings
 
 from changelogtxt_parser import serdes
+from changelogtxt_parser import version as version_tools
 from tests import strategies as sts
 
 BASE_SETTINGS = settings(
@@ -75,3 +76,71 @@ class TestLoad:
         expected = f"{message} line another line"
 
         assert result[-1]["changes"][0] == expected
+
+
+class TestDump:
+    def test_dump_unreleased_empty_changes(self, tmp_path):
+        file = tmp_path / "changelog.txt"
+        entries: list[version_tools.VersionEntry] = [{"version": "", "changes": []}]
+
+        serdes.dump(entries, str(file))
+        content = file.read_text(encoding="utf-8")
+
+        assert content.strip() == ""
+
+    @BASE_SETTINGS
+    @given(changes=sts.list_of_strings)
+    def test_dump_unreleased_with_changes(self, changes, tmp_path):
+        file = tmp_path / "changelog.txt"
+        entries: list[version_tools.VersionEntry] = [
+            {"version": "", "changes": changes},
+        ]
+
+        serdes.dump(entries, str(file))
+        content = file.read_text(encoding="utf-8")
+
+        for change in changes:
+            assert f"- {change}" in content
+
+    @BASE_SETTINGS
+    @given(version=sts.version_strings, changes=sts.list_of_strings)
+    def test_dump_version_with_changes(self, version, changes, tmp_path):
+        file = tmp_path / "changelog.txt"
+        entries: list[version_tools.VersionEntry] = [
+            {"version": version, "changes": changes},
+        ]
+
+        serdes.dump(entries, str(file))
+        content = file.read_text(encoding="utf-8")
+        lines = content.strip().split("\n")
+
+        assert lines[0] == version
+        for i, change in enumerate(changes):
+            assert lines[i + 1] == f"- {change}"
+
+    @BASE_SETTINGS
+    @given(entries=sts.list_of_version_entries)
+    def test_dump_multiple_entries(self, entries, tmp_path):
+        file = tmp_path / "changelog.txt"
+
+        serdes.dump(entries, file)
+        content = file.read_text(encoding="utf-8")
+
+        for entry in entries:
+            if entry["changes"]:
+                for change in entry["changes"]:
+                    assert f"- {change}" in content
+
+    @BASE_SETTINGS
+    @given(version=sts.version_strings)
+    def test_dump_version_without_changes(self, version, tmp_path):
+        file = tmp_path / "changelog.txt"
+        entries: list[version_tools.VersionEntry] = [
+            {"version": version, "changes": []},
+        ]
+
+        serdes.dump(entries, str(file))
+        content = file.read_text(encoding="utf-8")
+
+        assert version == content
+        assert len(content.splitlines()) == 1
