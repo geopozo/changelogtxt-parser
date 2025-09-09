@@ -40,10 +40,10 @@ def resolve_path(
 # Similar a `resolve_path` pero debe retornar un str con CHANGELOG.txt
 #   o el nombre del archivo que agrego en el arg `path`
 def find_file(path: str = "./") -> str:
+    filename = "CHANGELOG.txt"
     if pathlib.Path(path).is_file():
         return path
     if pathlib.Path(path).is_dir():
-        filename = "CHANGELOG.txt"
         for root, _, files in os.walk(path):
             if filename in files:
                 file_path = str(pathlib.Path(root) / filename)
