@@ -1,9 +1,12 @@
-from hypothesis import given, settings
+from hypothesis import HealthCheck, given, settings
 
 from changelogtxt_parser import serdes
 from tests import strategies as sts
 
-BASE_SETTINGS = settings(max_examples=20)
+BASE_SETTINGS = settings(
+    max_examples=20,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
 CHANGELOG_CONTENT = "v1.0.1\n- Fixed bug\n\nv1.0.0\n- Initial release"
 
 
@@ -13,9 +16,9 @@ class TestRoundtrip:
     def test_roundtrip(
         self,
         entries,
-        tmp_path_factory,
+        tmp_path,
     ):
-        file = tmp_path_factory.mktemp("test") / "CHANGELOG.txt"
+        file = tmp_path / "CHANGELOG.txt"
         file.write_text(CHANGELOG_CONTENT)
         entries.insert(0, {"version": "", "changes": []})
 

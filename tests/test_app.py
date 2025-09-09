@@ -1,10 +1,13 @@
 import pytest
-from hypothesis import assume, given, settings
+from hypothesis import HealthCheck, assume, given, settings
 
 from changelogtxt_parser import app
 from tests import strategies as sts
 
-BASE_SETTINGS = settings(max_examples=20)
+BASE_SETTINGS = settings(
+    max_examples=20,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
 ASSUME_LIST = ["v1.0.1", "v1.0.0"]
 CHANGELOG_CONTENT = "v1.0.1\n- Fixed bug\n\nv1.0.0\n- Initial release"
 
@@ -16,9 +19,9 @@ class TestCheckTag:
         self,
         version,
         message,
-        tmp_path_factory,
+        tmp_path,
     ):
-        file = tmp_path_factory.mktemp("test") / "CHANGELOG.txt"
+        file = tmp_path / "CHANGELOG.txt"
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -29,8 +32,8 @@ class TestCheckTag:
 
     @BASE_SETTINGS
     @given(version=sts.version_strings)
-    def test_check_tag_non_existing(self, version, tmp_path_factory):
-        file = tmp_path_factory.mktemp("test") / "CHANGELOG.txt"
+    def test_check_tag_non_existing(self, version, tmp_path):
+        file = tmp_path / "CHANGELOG.txt"
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -48,9 +51,9 @@ class TestUpdate:
         self,
         version,
         message,
-        tmp_path_factory,
+        tmp_path,
     ):
-        file = tmp_path_factory.mktemp("test") / "CHANGELOG.txt"
+        file = tmp_path / "CHANGELOG.txt"
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -68,9 +71,9 @@ class TestUpdate:
         self,
         version,
         message,
-        tmp_path_factory,
+        tmp_path,
     ):
-        file = tmp_path_factory.mktemp("test") / "CHANGELOG.txt"
+        file = tmp_path / "CHANGELOG.txt"
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -89,9 +92,9 @@ class TestUpdate:
         self,
         version,
         message,
-        tmp_path_factory,
+        tmp_path,
     ):
-        file = tmp_path_factory.mktemp("test") / "CHANGELOG.txt"
+        file = tmp_path / "CHANGELOG.txt"
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -128,9 +131,9 @@ class TestUpdate:
         self,
         version,
         message,
-        tmp_path_factory,
+        tmp_path,
     ):
-        file = tmp_path_factory.mktemp("test") / "CHANGELOG.txt"
+        file = tmp_path / "CHANGELOG.txt"
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -147,9 +150,9 @@ class TestUpdate:
         self,
         version,
         message,
-        tmp_path_factory,
+        tmp_path,
     ):
-        file = tmp_path_factory.mktemp("test") / "CHANGELOG.txt"
+        file = tmp_path / "CHANGELOG.txt"
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -224,11 +227,10 @@ class TestSummarizeNews:
         self,
         version,
         message,
-        tmp_path_factory,
+        tmp_path,
     ):
-        workdir = tmp_path_factory.mktemp("test")
-        source_file = workdir / "source.txt"
-        target_file = workdir / "target.txt"
+        source_file = tmp_path / "source.txt"
+        target_file = tmp_path / "target.txt"
         source_file.write_text(CHANGELOG_CONTENT)
         target_file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
