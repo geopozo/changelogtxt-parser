@@ -72,5 +72,8 @@ ignore = [
 log_cli = true
 addopts = "--cov=src/changelogtxt_parser --cov-report html tests/"
 
+[tool.coverage.run]
+omit = ["src/changelogtxt_parser/_cli.py"]
+
 [tool.mypy]
 files = ["src/changelogtxt_parser"]
