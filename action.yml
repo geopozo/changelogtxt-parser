@@ -1,0 +1,54 @@
+---
+name: "Check Changelog"
+description: "Verify many things in changelog"
+
+inputs:
+  python-version:
+    description: "Python version to use with uv"
+    required: false
+    default: "3.12"
+  working-directory:
+    description: "Directory where the command will be executed"
+    required: true
+  use-local:
+    description: "Use local changelogtxt-parser instead of GitHub repo"
+    required: false
+    default: "true"
+  changelogtxt:
+    description: "Reference to the changelogtxt-parser package"
+    required: false
+    default: >-
+      git+https://github.com/geopozo/changelogtxt-parser
+
+outputs:
+  check-result:
+    description: "Output of the check-format command"
+    value: ${{ steps.format.outputs.result }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v5
+
+    - id: format
+      name: Check format
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        if [[ "${{ inputs.use-local }}" == "true" ]]; then
+          RESULT=$(
+            uv run \
+              --python "${{ inputs.python-version }}" \
+              --directory "$GITHUB_ACTION_PATH" \
+              changelogtxt check-format
+          )
+        else
+          RESULT=$(
+            uv run \
+              --python "${{ inputs.python-version }}" \
+              --with "${{ inputs.changelogtxt }}" \
+              changelogtxt check-format
+          )
+        fi
+        echo "result=$RESULT" >> "$GITHUB_OUTPUT"
