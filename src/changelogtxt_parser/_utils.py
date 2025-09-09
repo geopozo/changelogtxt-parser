@@ -24,7 +24,9 @@ def resolve_path(
     if not file_path.is_absolute():
         file_path = file_path.resolve()
 
-    # debemos revisar primero que no es dir?
+    if file_path.is_dir():
+        raise IsADirectoryError(f"Expected a file but got a directory: {file_path}")
+
     if touch:
         file_path.touch()
 
