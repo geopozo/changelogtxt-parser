@@ -1,8 +1,8 @@
 import pytest
 from hypothesis import assume, given, settings
 
-import tests.strategies as sts
 from changelogtxt_parser import app
+from tests import strategies as sts
 
 BASE_SETTINGS = settings(max_examples=20)
 ASSUME_LIST = ["v1.0.1", "v1.0.0"]
