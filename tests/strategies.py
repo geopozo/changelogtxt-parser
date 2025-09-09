@@ -23,13 +23,16 @@ random_string = st.text(
 
 list_of_strings = st.lists(random_string, min_size=2, max_size=10, unique=True)
 
-list_of_version_entries = st.lists(
-    st.builds(
-        lambda version, change: {"version": version, "changes": [change]},
-        version=version_strings,
-        change=random_string,
+list_of_version_entries = st.one_of(
+    st.just([]),
+    st.lists(
+        st.builds(
+            lambda version, change: {"version": version, "changes": [change]},
+            version=version_strings,
+            change=random_string,
+        ),
+        min_size=2,
+        max_size=10,
+        unique_by=lambda entry: str(entry["version"]),
     ),
-    min_size=2,
-    max_size=10,
-    unique_by=lambda entry: str(entry["version"]),
 )
