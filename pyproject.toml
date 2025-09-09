@@ -36,6 +36,7 @@ dev = [
   "hypothesis>=6.138.14",
   "mypy>=1.17.1",
   "pytest>=8.4.1",
+  "pytest-cov>=7.0.0",
   "pytest-xdist>=3.8.0",
 ]
 
