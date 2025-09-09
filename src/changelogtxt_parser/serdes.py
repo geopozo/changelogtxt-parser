@@ -5,17 +5,7 @@ from __future__ import annotations
 from changelogtxt_parser import _utils
 from changelogtxt_parser import version as version_tools
 
-# yo veo una lista de ejemplos buenos (tal vez no completo?) pero ya como was a
-# estructurar las pruebas (lo de chat gpt)
 
-
-# Crea data mock de texto plano para llenar un tmp(del fixture)
-#   lo paso a load(tmp) y verifico que la salida coincida con
-#   una lista de VersionEntry esperada.
-# Casos de prueba:
-# * Bullets sin version y verificar los 'changes' unreleased.
-# * Version con bullets y sin bullets.
-# * Bullets sin contenido para verificar el error.
 def load(file_path: str) -> list[version_tools.VersionEntry]:
     """
     Parse a changelog file and returns a list of version entries.
@@ -61,14 +51,6 @@ def load(file_path: str) -> list[version_tools.VersionEntry]:
     return changelog
 
 
-# Crea data mock de list[VersionEntry] y pasarla a dump(list) y
-#   verifico que el archivo creado contenga parte de los cambios que genere.
-# Casos de prueba:
-# * Verificar llave "unrelease" y sus "changes" = [].
-# * Verificar llave "unrelease" y sus "changes" que coincidan
-#   con los de las entradas.
-# * Una version con changes que tenga los bullets correctos.
-# * Una version mal formateada y verificarla en el archivo
 def dump(
     entries: list[version_tools.VersionEntry],
     file_path: str,
