@@ -6,14 +6,6 @@ logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
-# casos correctos pero dadas las dudas de la function seguiente, tengo que enter
-# un poco mejor esto.
-# Crea data mock y pasa a resolve_path(tmp) y que retorne el objeto de `Path` de
-#   Path() correcta
-# Casos de prueba:
-# * Pasar arg path existente y retorne una instancia de Path y el str correcto
-# * Pasar arg path y touch y verificar que el archivo fue creado.
-# * Path que no existe devuelve FileNotFountError
 def resolve_path(
     path: str,
     *,
@@ -36,9 +28,6 @@ def resolve_path(
     return file_path
 
 
-# probablemente este concepto sería incorrecto, "resultados infinitos".
-# Similar a `resolve_path` pero debe retornar un str con CHANGELOG.txt
-#   o el nombre del archivo que agrego en el arg `path`
 def find_file(path: str = "./") -> str:
     filename = "CHANGELOG.txt"
     if pathlib.Path(path).is_file():
