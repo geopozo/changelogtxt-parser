@@ -1,28 +1,15 @@
 """App ChangelogTXT Module."""
 
-from changelogtxt_parser import _utils, serdes
+from changelogtxt_parser import serdes
 from changelogtxt_parser import version as version_tools
 
-DEFAULT_VER = "unreleased"
 
-
-# Crea data mock de un changelog tmp(fixture) para file path:
-# Casos de prueba:
-# * Pasar un arg de una version que exista en el archivo y verificar el `ValueError`
-# * Pasar el arg `force` si puede agregar un punto a una versión ya existente y
-# verificar el archivo.
-# * Pasar en str de `unreleased` como arg de version y el arg `message` para agregar
-#   un nuevo punto en el header del archivo.
-# * Pasar un arg de una `version` que no existe un tmp(fixture) con puntos en el header
-#   del archivo(unreleased) debe verificar si estan asignados en el archivo a la version
-#   pasada por arg
-# Nota: tengo dudas de si en este caso es viable usar hypothesis
 def update(
     version: str,
     message: str,
-    file_path: str,
+    file_path: str = "./CHANGELOG.txt",
     *,
-    force=False,
+    force: bool = False,
 ) -> None:
     """
     Create a new version entry if it doesn't exist.
@@ -40,18 +27,19 @@ def update(
             force.
 
     """
-    version = version.lower()
-    if version == DEFAULT_VER:
-        new_version = version
+    if not version:
+        new_version = ""
         force = True
     elif not (new_version := version_tools.parse_version(version)):
         raise ValueError(f"Poorly formatted version value {version}")
 
     entries = serdes.load(file_path)
     for entry in entries:
-        if str(new_version) == entry["version"]:
+        if str(new_version) == entry["version"].removeprefix("v"):
             if not force:
                 raise ValueError("Cannot overwrite an existing version.")
+            if not message:
+                raise ValueError("Version already exists: Nothing to do.")
             current_changes = entry["changes"]
             break
     else:
@@ -68,14 +56,6 @@ def update(
     serdes.dump(entries, file_path)
 
 
-# Crea data mock de un changelog tmp(fixture) para file path:
-# Casos de prueba:
-# * Pasar un arg tag que exista que inicie con `v` y verificar que el retorno
-#   sea None
-# * Pasar un arg tag que exista que no inicie con `v` y verificar que el
-#   retorno sea None
-# * Pasar un arg `tag` que no exista en el archivo y verificar que saque error
-# Nota: tengo dudas de si en este caso es viable usar hypothesis
 def check_tag(tag: str, file_path: str) -> None:
     """
     Validate whether a given version tag exists in the changelog file.
@@ -97,14 +77,10 @@ def check_tag(tag: str, file_path: str) -> None:
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 
-# Crea data mock de dos tmp(fixture) para source y target file path:
-# Casos de prueba:
-# * Pasar las dos changelog iguales y verificar que retorne `[]`
-# * Pasar dos changelog diferentes y verificar que retorne len(list) > 0
-def compare_files(
+def summarize_news(
     source_file_path: str,
     target_file_path: str,
-) -> list[version_tools.VersionEntry]:
+) -> tuple[set[str], dict[str, set[str]]]:
     """
     Compare two changelog files to detect version or change differences.
 
@@ -113,11 +89,20 @@ def compare_files(
         target_file_path: Path to the updated changelog file to compare against.
 
     Returns:
-        A list of VersionEntry representing the differences found,
-            or an empty list if the files are equivalent.
+        A list of tuple[set[str], dict[str, list[str]]] representing the differences
+        found, or an empty list if the files are equivalent.
 
     """
-    src_file = serdes.load(source_file_path)
-    trg_file = serdes.load(target_file_path)
+    src = serdes.load(source_file_path)
+    trg = serdes.load(target_file_path)
 
-    return _utils.get_diffs(src_file, trg_file)
+    src_dict = {entry["version"]: entry["changes"] for entry in src}
+    trg_dict = {entry["version"]: entry["changes"] for entry in trg}
+
+    new_versions = trg_dict.keys() - src_dict.keys()
+    new_changes = {}
+    for v in src_dict.keys() & trg_dict.keys():
+        if c := set(trg_dict[v]) - set(src_dict[v]):
+            new_changes[v] = c
+
+    return new_versions, new_changes
