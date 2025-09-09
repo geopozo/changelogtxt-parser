@@ -27,7 +27,7 @@ class TestCheckTag:
         assume(version not in ASSUME_LIST)
 
         app.update(version, message, file)
-        result = app.check_tag(version, str(file))
+        result = app.check_tag(version, file)
 
         assert result is None
 
@@ -42,7 +42,7 @@ class TestCheckTag:
             ValueError,
             match=(f"Tag '{version}' not found in changelog"),
         ):
-            app.check_tag(version, str(file))
+            app.check_tag(version, file)
 
 
 class TestUpdate:
@@ -58,7 +58,7 @@ class TestUpdate:
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
-        app.update(version, message, str(file))
+        app.update(version, message, file)
         updated_file = file.read_text(encoding="utf-8")
         first_line = updated_file.splitlines()[0]
 
@@ -78,8 +78,8 @@ class TestUpdate:
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
-        app.update("", message, str(file))
-        app.update(version, "", str(file))
+        app.update("", message, file)
+        app.update(version, "", file)
         updated_file = file.read_text(encoding="utf-8")
         first_line = updated_file.splitlines()[0]
 
@@ -99,8 +99,8 @@ class TestUpdate:
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
-        app.update("", message, str(file))
-        app.update(version, message, str(file))
+        app.update("", message, file)
+        app.update(version, message, file)
 
         updated_file = file.read_text(encoding="utf-8").splitlines()
         idx = next(i for i, line in enumerate(updated_file) if version in line)
@@ -110,7 +110,7 @@ class TestUpdate:
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         with pytest.raises(ValueError, match="Cannot overwrite an existing version."):
-            app.update("v1.0.1", "New change", str(file))
+            app.update("v1.0.1", "New change", file)
 
     def test_update_existing_version_with_force_no_message_allows_update(
         self,
@@ -119,7 +119,7 @@ class TestUpdate:
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         message = "New change"
-        app.update("v1.0.1", message, str(file), force=True)
+        app.update("v1.0.1", message, file, force=True)
         updated_file = file.read_text(encoding="utf-8")
         second_line = updated_file.splitlines()[1]
 
@@ -138,7 +138,7 @@ class TestUpdate:
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
-        app.update("", message, str(file))
+        app.update("", message, file)
         updated_file = file.read_text(encoding="utf-8")
         first_line = updated_file.splitlines()[0]
 
@@ -157,9 +157,9 @@ class TestUpdate:
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
-        app.update("", "New feature added", str(file))
-        app.update("", "Performance improvements", str(file))
-        app.update("", message, str(file))
+        app.update("", "New feature added", file)
+        app.update("", "Performance improvements", file)
+        app.update("", message, file)
 
         updated_file = file.read_text(encoding="utf-8")
         message_index = updated_file.find(f"- {message}")
@@ -177,19 +177,19 @@ class TestUpdate:
         file.write_text(CHANGELOG_CONTENT)
 
         with pytest.raises(ValueError, match="Poorly formatted version value"):
-            app.update("rc1.0.1fr", "test message", str(file))
+            app.update("rc1.0.1fr", "test message", file)
 
     def test_update_unreleased_missing_version_and_message(self, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         with pytest.raises(ValueError, match="Version already exists: Nothing to do."):
-            app.update("", "", str(file))
+            app.update("", "", file)
 
     def test_update_version_missing_message(self, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         with pytest.raises(ValueError, match="Version already exists: Nothing to do."):
-            app.update("v1.0.1", "", str(file), force=True)
+            app.update("v1.0.1", "", file, force=True)
 
 
 class TestSummarizeNews:
@@ -200,10 +200,7 @@ class TestSummarizeNews:
         target_file.write_text(CHANGELOG_CONTENT)
 
         app.update("", "New change", str(target_file))
-        new_versions, new_changes = app.summarize_news(
-            str(source_file),
-            str(target_file),
-        )
+        new_versions, new_changes = app.summarize_news(source_file, target_file)
 
         assert new_versions == set()
         assert "New change" in new_changes[""]
@@ -214,10 +211,7 @@ class TestSummarizeNews:
         source_file.write_text(CHANGELOG_CONTENT)
         target_file.write_text(CHANGELOG_CONTENT)
 
-        new_versions, new_changes = app.summarize_news(
-            str(source_file),
-            str(target_file),
-        )
+        new_versions, new_changes = app.summarize_news(source_file, target_file)
 
         assert new_versions == set()
         assert new_changes == {}
@@ -236,12 +230,9 @@ class TestSummarizeNews:
         target_file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
-        app.update(version, message, str(target_file))
+        app.update(version, message, target_file)
 
-        new_versions, new_changes = app.summarize_news(
-            str(source_file),
-            str(target_file),
-        )
+        new_versions, new_changes = app.summarize_news(source_file, target_file)
 
         assert version in new_versions
         assert new_changes == {}
@@ -252,7 +243,7 @@ class TestSummarizeNews:
         source_file.write_text(CHANGELOG_CONTENT)
         target_file.write_text(CHANGELOG_CONTENT)
 
-        app.update("", "New change", str(target_file))
+        app.update("", "New change", target_file)
 
-        _, new_changes = app.summarize_news(str(source_file), str(target_file))
+        _, new_changes = app.summarize_news(source_file, target_file)
         assert "New change" in new_changes[""]

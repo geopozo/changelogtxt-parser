@@ -38,7 +38,7 @@ class TestLoad:
         file = tmp_path / DEFAULT_FILE
 
         serdes.dump([{"version": "", "changes": changes}], file)
-        result = serdes.load(str(file))
+        result = serdes.load(file)
 
         assert result[0]["version"] == ""
         assert result[0]["changes"] == changes
@@ -49,7 +49,7 @@ class TestLoad:
         file = tmp_path / DEFAULT_FILE
 
         serdes.dump([{"version": version, "changes": changes}], file)
-        result = serdes.load(str(file))
+        result = serdes.load(file)
 
         assert result[0]["version"] == ""
         assert result[0]["changes"] == []
@@ -64,7 +64,7 @@ class TestLoad:
             ValueError,
             match='Invalid changelog format at line 2: Expected content after "-"',
         ):
-            serdes.load(str(file))
+            serdes.load(file)
 
     @BASE_SETTINGS
     @given(version=sts.version_strings, message=sts.random_string)
@@ -72,7 +72,7 @@ class TestLoad:
         file = tmp_path / DEFAULT_FILE
         file.write_text(f"{version}\n- {message}\n line another line", encoding="utf-8")
 
-        result = serdes.load(str(file))
+        result = serdes.load(file)
         expected = f"{message} line another line"
 
         assert result[-1]["changes"][0] == expected
@@ -83,7 +83,7 @@ class TestDump:
         file = tmp_path / "changelog.txt"
         entries: list[version_tools.VersionEntry] = [{"version": "", "changes": []}]
 
-        serdes.dump(entries, str(file))
+        serdes.dump(entries, file)
         content = file.read_text(encoding="utf-8")
 
         assert content.strip() == ""
@@ -96,7 +96,7 @@ class TestDump:
             {"version": "", "changes": changes},
         ]
 
-        serdes.dump(entries, str(file))
+        serdes.dump(entries, file)
         content = file.read_text(encoding="utf-8")
 
         for change in changes:
@@ -110,7 +110,7 @@ class TestDump:
             {"version": version, "changes": changes},
         ]
 
-        serdes.dump(entries, str(file))
+        serdes.dump(entries, file)
         content = file.read_text(encoding="utf-8")
         lines = content.strip().split("\n")
 
@@ -139,7 +139,7 @@ class TestDump:
             {"version": version, "changes": []},
         ]
 
-        serdes.dump(entries, str(file))
+        serdes.dump(entries, file)
         content = file.read_text(encoding="utf-8")
 
         assert version == content
