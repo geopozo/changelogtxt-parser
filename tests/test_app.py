@@ -8,6 +8,7 @@ BASE_SETTINGS = settings(
     max_examples=20,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
 )
+DEFAULT_FILE = "CHANGELOG.txt"
 ASSUME_LIST = ["v1.0.1", "v1.0.0"]
 CHANGELOG_CONTENT = "v1.0.1\n- Fixed bug\n\nv1.0.0\n- Initial release"
 
@@ -21,7 +22,7 @@ class TestCheckTag:
         message,
         tmp_path,
     ):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -33,7 +34,7 @@ class TestCheckTag:
     @BASE_SETTINGS
     @given(version=sts.version_strings)
     def test_check_tag_non_existing(self, version, tmp_path):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -53,7 +54,7 @@ class TestUpdate:
         message,
         tmp_path,
     ):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -73,7 +74,7 @@ class TestUpdate:
         message,
         tmp_path,
     ):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -94,7 +95,7 @@ class TestUpdate:
         message,
         tmp_path,
     ):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -106,7 +107,7 @@ class TestUpdate:
         assert f"- {message}" in updated_file[idx + 1]
 
     def test_update_existing_version_raises_error(self, tmp_path):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         with pytest.raises(ValueError, match="Cannot overwrite an existing version."):
             app.update("v1.0.1", "New change", str(file))
@@ -115,7 +116,7 @@ class TestUpdate:
         self,
         tmp_path,
     ):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         message = "New change"
         app.update("v1.0.1", message, str(file), force=True)
@@ -133,7 +134,7 @@ class TestUpdate:
         message,
         tmp_path,
     ):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -152,7 +153,7 @@ class TestUpdate:
         message,
         tmp_path,
     ):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
 
@@ -172,20 +173,20 @@ class TestUpdate:
         assert message_index < performance_index
 
     def test_update_invalid_version_format(self, tmp_path):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
 
         with pytest.raises(ValueError, match="Poorly formatted version value"):
             app.update("rc1.0.1fr", "test message", str(file))
 
     def test_update_unreleased_missing_version_and_message(self, tmp_path):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         with pytest.raises(ValueError, match="Version already exists: Nothing to do."):
             app.update("", "", str(file))
 
     def test_update_version_missing_message(self, tmp_path):
-        file = tmp_path / "CHANGELOG.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         with pytest.raises(ValueError, match="Version already exists: Nothing to do."):
             app.update("v1.0.1", "", str(file), force=True)
