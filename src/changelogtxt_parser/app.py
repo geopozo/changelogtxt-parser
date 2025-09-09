@@ -5,11 +5,11 @@ from changelogtxt_parser import version as version_tools
 
 
 def update(
-    version: str = "",
-    message: str = "",
+    version: str,
+    message: str,
     file_path: str = "./CHANGELOG.txt",
     *,
-    force=False,
+    force: bool = False,
 ) -> None:
     """
     Create a new version entry if it doesn't exist.
@@ -27,9 +27,8 @@ def update(
             force.
 
     """
-    version = version.lower()
-    if version == "":
-        new_version = version
+    if not version:
+        new_version = ""
         force = True
     elif not (new_version := version_tools.parse_version(version)):
         raise ValueError(f"Poorly formatted version value {version}")
