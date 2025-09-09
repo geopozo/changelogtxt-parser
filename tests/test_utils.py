@@ -10,6 +10,7 @@ BASE_SETTINGS = settings(
     max_examples=20,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
 )
+DEFAULT_FILE = "CHANGELOG.txt"
 
 
 class TestResolvePath:
@@ -59,8 +60,46 @@ class TestResolvePath:
             _utils.resolve_path(directory)
 
     def test_resolve_path_expanduser_works(self, tmp_path):
-        file = tmp_path / "test.txt"
+        file = tmp_path / DEFAULT_FILE
         file.write_text("content")
 
-        result = _utils.resolve_path(str(file))
+        result = _utils.resolve_path(file)
         assert isinstance(result, pathlib.Path)
+
+
+class TestFindFile:
+    def test_find_file_when_path_is_file_returns_same_path(self, tmp_path):
+        file = tmp_path / DEFAULT_FILE
+        file.write_text("test content")
+
+        result = _utils.find_file(str(file))
+
+        assert result == str(file)
+
+    def test_find_file_finds_changelog_in_directory(self, tmp_path):
+        changelog = tmp_path / DEFAULT_FILE
+        changelog.write_text("changelog content")
+
+        result = _utils.find_file(str(tmp_path))
+
+        assert result == str(changelog)
+        assert DEFAULT_FILE in result
+
+    def test_find_file_no_changelog_raises_file_not_found_error(self, tmp_path):
+        empty_dir = tmp_path / "empty"
+        empty_dir.mkdir()
+
+        with pytest.raises(
+            FileNotFoundError,
+            match=f"{DEFAULT_FILE} file not found in the specified path.",
+        ):
+            _utils.find_file(str(empty_dir))
+
+    def test_find_file_nonexistent_path_raises_error(self):
+        nonexistent_path = "/nonexistent/path/that/does/not/exist"
+
+        with pytest.raises(
+            FileNotFoundError,
+            match=f"{DEFAULT_FILE} file not found in the specified path.",
+        ):
+            _utils.find_file(nonexistent_path)
