@@ -31,6 +31,7 @@ runs:
       name: Check format
       if: ${{ fromJSON(inputs.format-check) }}
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
         uv run --with '${{ github.action_path }}' \
           changelogtxt check-format \
@@ -39,8 +40,9 @@ runs:
       name: Check tag
       if: ${{ inputs.tag-check != '' }}
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
         uv run --with '${{ github.action_path }}' \
           changelogtxt check-tag \
-          -f ${{ inputs.working-directory }}
           -t "${{ inputs.tag-check }}" \
+          -f ${{ inputs.working-directory }}
