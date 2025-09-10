@@ -53,6 +53,7 @@ runs:
     - id: summarize
       name: Summarize News
       if: ${{ inputs.summarize-news != '' }}
+      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
         set -euo pipefail
