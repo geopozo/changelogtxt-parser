@@ -14,7 +14,7 @@ inputs:
   format-check:
     description: "Whether to run the check-format step (boolean)"
     required: false
-    default: "false"
+    default: "true"
   tag-check:
     description: "Tag to verify"
     required: false
