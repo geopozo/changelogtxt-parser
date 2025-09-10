@@ -57,7 +57,7 @@ runs:
       run: |
         set -euo pipefail
         echo "Summarizing news..."
-        read origin target <<< "${{ inputs.compare-files }}"
+        read origin target <<< "${{ inputs.summarize-news }}"
         echo "Origin: $origin"
         echo "Target: $target"
         uv run --with '${{ github.action_path }}' \
