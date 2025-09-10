@@ -52,7 +52,7 @@ runs:
           -f ${{ inputs.working-directory }}
     - id: summarize
       name: Summarize News
-      if: ${{ inputs.compare-files != '' }}
+      if: ${{ inputs.summarize-news != '' }}
       shell: bash
       run: |
         set -euo pipefail
