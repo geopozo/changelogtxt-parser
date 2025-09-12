@@ -16,7 +16,7 @@ def resolve_file_path(
         file_path = file_path.resolve()
 
     if file_path.is_dir():
-        raise IsADirectoryError(f"Expected a file but got a directory: {file_path}")
+        file_path = file_path / "CHANGELOG.txt"
 
     if touch:
         file_path.touch()

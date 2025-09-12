@@ -97,8 +97,8 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         help="Force update of an existing version",
     )
 
-    basic_args = parser.parse_args()  # no es lo mejor, no recuerdo por qué
-    return parser, vars(basic_args)  # es necessario usar vars()?
+    basic_args = parser.parse_args()
+    return parser, vars(basic_args)
 
 
 def run_cli() -> None:
