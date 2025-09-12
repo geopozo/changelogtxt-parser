@@ -33,6 +33,7 @@ class TestRoundtrip:
 
         assert loaded == entries
 
+
 # y por qué no dump caundo es valido?
 class TestLoad:
     @BASE_SETTINGS
@@ -47,7 +48,7 @@ class TestLoad:
         assert result[0]["changes"] == changes
 
     @BASE_SETTINGS
-    @given(version=sts.version_strings, changes=sts.list_of_strings)
+    @given(version=sts.version_st, changes=sts.list_of_strings)
     def test_load_version_with_version_and_changes(self, version, changes, tmp_path):
         file = tmp_path / DEFAULT_FILE
 
@@ -71,7 +72,7 @@ class TestLoad:
 
     # debes agregar multiline a la estrategia
     @BASE_SETTINGS
-    @given(version=sts.version_strings, message=sts.random_string)
+    @given(version=sts.version_st, message=sts.random_string)
     def test_load_multiline_changes(self, version, message, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(f"{version}\n- {message}\n line another line", encoding="utf-8")
@@ -80,6 +81,7 @@ class TestLoad:
         expected = f"{message} line another line"
 
         assert result[-1]["changes"][0] == expected
+
 
 # y por que no load cuando es valido?
 class TestDump:
@@ -107,7 +109,7 @@ class TestDump:
             assert f"- {change}" in content
 
     @BASE_SETTINGS
-    @given(version=sts.version_strings, changes=sts.list_of_strings)
+    @given(version=sts.version_st, changes=sts.list_of_strings)
     def test_dump_version_with_changes(self, version, changes, tmp_path):
         file = tmp_path / "changelog.txt"
         entries: list[version_tools.VersionEntry] = [
@@ -136,7 +138,7 @@ class TestDump:
                     assert f"- {change}" in content
 
     @BASE_SETTINGS
-    @given(version=sts.version_strings)
+    @given(version=sts.version_st)
     def test_dump_version_without_changes(self, version, tmp_path):
         file = tmp_path / "changelog.txt"
         entries: list[version_tools.VersionEntry] = [

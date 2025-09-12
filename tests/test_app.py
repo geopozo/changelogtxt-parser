@@ -15,7 +15,7 @@ CHANGELOG_CONTENT = "v1.0.1\n- Fixed bug\n\nv1.0.0\n- Initial release"
 
 class TestCheckTag:
     @BASE_SETTINGS
-    @given(version=sts.version_strings, message=sts.random_string)
+    @given(version=sts.version_st, message=sts.random_string)
     def test_check_tag_existing(
         self,
         version,
@@ -32,7 +32,7 @@ class TestCheckTag:
         assert result is None
 
     @BASE_SETTINGS
-    @given(version=sts.version_strings)
+    @given(version=sts.version_st)
     def test_check_tag_non_existing(self, version, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
@@ -47,7 +47,7 @@ class TestCheckTag:
 
 class TestUpdate:
     @BASE_SETTINGS
-    @given(version=sts.version_strings, message=sts.random_string)
+    @given(version=sts.version_st, message=sts.random_string)
     def test_update_add_new_version(
         self,
         version,
@@ -67,7 +67,7 @@ class TestUpdate:
         assert f"- {message}" in updated_file
 
     @BASE_SETTINGS
-    @given(version=sts.version_strings, message=sts.random_string)
+    @given(version=sts.version_st, message=sts.random_string)
     def test_update_new_version_moves_unreleased_points(
         self,
         version,
@@ -88,7 +88,7 @@ class TestUpdate:
         assert message in updated_file
 
     @BASE_SETTINGS
-    @given(version=sts.version_strings, message=sts.random_string)
+    @given(version=sts.version_st, message=sts.random_string)
     def test_update_new_version_with_message_and_unreleased(
         self,
         version,
@@ -127,7 +127,7 @@ class TestUpdate:
         assert message in second_line
 
     @BASE_SETTINGS
-    @given(version=sts.version_strings, message=sts.random_string)
+    @given(version=sts.version_st, message=sts.random_string)
     def test_update_unreleased_no_existing_changes(
         self,
         version,
@@ -146,7 +146,7 @@ class TestUpdate:
         assert message in first_line
 
     @BASE_SETTINGS
-    @given(version=sts.version_strings, message=sts.random_string)
+    @given(version=sts.version_st, message=sts.random_string)
     def test_update_unreleased_with_existing_changes(
         self,
         version,
@@ -217,7 +217,7 @@ class TestSummarizeNews:
         assert new_changes == {}
 
     @BASE_SETTINGS
-    @given(version=sts.version_strings, message=sts.random_string)
+    @given(version=sts.version_st, message=sts.random_string)
     def test_summarize_news_new_version(
         self,
         version,
