@@ -27,9 +27,9 @@ list_of_version_entries = st.one_of(
     st.just([]),
     st.lists(
         st.builds(
-            lambda version, change: {"version": version, "changes": [change]},
+            lambda version, changes: {"version": version, "changes": changes},
             version=version_st,
-            change=list_of_strings,
+            changes=list_of_strings,
         ),
         min_size=2,
         max_size=10,
