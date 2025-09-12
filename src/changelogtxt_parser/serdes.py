@@ -17,7 +17,7 @@ def load(file_path: str) -> list[version_tools.VersionEntry]:
         A list of `VersionEntry` with changelog data
 
     """
-    file = _utils.resolve_path(file_path)
+    file = _utils.resolve_file_path(file_path)
 
     with file.open("r", encoding="utf-8") as f:
         changelog: list[version_tools.VersionEntry] = []
@@ -71,7 +71,7 @@ def dump(
         file_path: Path to the file where the changelog will be written.
 
     """
-    file = _utils.resolve_path(file_path, touch=True)
+    file = _utils.resolve_file_path(file_path, touch=True)
 
     changelog = []
     for entry in entries:

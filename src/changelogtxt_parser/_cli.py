@@ -38,7 +38,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "--file",
         help="Optional file path.",
         required=False,
-        default="./",
+        default="./CHANGELOG.txt",
     )
 
     check_format = subparsers.add_parser(
@@ -51,7 +51,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "--file",
         help="Optional file path.",
         required=False,
-        default="./",
+        default="./CHANGELOG.txt",
     )
 
     compare_files = subparsers.add_parser(
@@ -89,7 +89,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "--file",
         help="Optional file path.",
         required=False,
-        default="./",
+        default="./CHANGELOG.txt",
     )
     update.add_argument(
         "--force",
@@ -113,12 +113,12 @@ def run_cli() -> None:
 
     match command:
         case "check-tag":
-            file = _utils.find_file(file)
-            app.check_tag(tag, file)
+            file = _utils.resolve_file_path(file)
+            app.check_tag(tag, str(file))
             print(f"Tag validation for {tag} was successful.")
         case "check-format":
-            file = _utils.find_file(file)
-            serdes.load(file)
+            file = _utils.resolve_file_path(file)
+            serdes.load(str(file))
             print("Changelog format validation was successful.")
         case "summarize-news":
             diff = app.summarize_news(source_file, target_file)
@@ -128,8 +128,8 @@ def run_cli() -> None:
                 print("No changes found", file=sys.stderr)
                 sys.exit(1)
         case "update":
-            file = _utils.find_file(file)
-            app.update(tag, message, file, force=force)
+            file = _utils.resolve_file_path(file)
+            app.update(tag, message, str(file), force=force)
             print(f"File update was successful and generated at: {file}")
         case _:
             print("No command supplied.", file=sys.stderr)
