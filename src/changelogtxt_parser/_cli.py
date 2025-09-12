@@ -96,8 +96,8 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         help="Force update of an existing version",
     )
 
-    basic_args = parser.parse_args()
-    return parser, vars(basic_args)
+    basic_args = parser.parse_args() # no es lo mejor, no recuerdo por qué
+    return parser, vars(basic_args) # es necessario usar vars()?
 
 
 def run_cli() -> None:
@@ -122,7 +122,7 @@ def run_cli() -> None:
         case "summarize-news":
             diff = app.summarize_news(source_file, target_file)
             if any(diff):
-                print(diff)
+                print(diff) # acá sería el punto de ponerlo bonito
             else:
                 print("No changes found", file=sys.stderr)
                 sys.exit(1)

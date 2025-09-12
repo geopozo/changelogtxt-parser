@@ -21,7 +21,7 @@ def load(file_path: str) -> list[version_tools.VersionEntry]:
 
     with file.open("r", encoding="utf-8") as f:
         changelog: list[version_tools.VersionEntry] = [
-            {"version": "", "changes": []},
+            {"version": "", "changes": []}, # si?
         ]
         current_entry: version_tools.VersionEntry = changelog[-1]
 

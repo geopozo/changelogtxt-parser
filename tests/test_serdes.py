@@ -24,17 +24,20 @@ class TestRoundtrip:
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         entries.insert(0, {"version": "", "changes": []})
+        # buen punto por un comentario
+        # por que necesitamos esta linea
+        # pero dump y load funciona sin esto?
 
         serdes.dump(entries, file)
         loaded = serdes.load(file)
 
         assert loaded == entries
 
-
+# y por qué no dump caundo es valido?
 class TestLoad:
     @BASE_SETTINGS
     @given(changes=sts.list_of_strings)
-    def test_load_bullets_without_version_unreleased_changes(self, changes, tmp_path):
+    def test_load_bullets_with_only_unreleased_changes(self, changes, tmp_path):
         file = tmp_path / DEFAULT_FILE
 
         serdes.dump([{"version": "", "changes": changes}], file)
@@ -45,7 +48,7 @@ class TestLoad:
 
     @BASE_SETTINGS
     @given(version=sts.version_strings, changes=sts.list_of_strings)
-    def test_load_version_with_bullets(self, version, changes, tmp_path):
+    def test_load_version_with_version_and_changes(self, version, changes, tmp_path):
         file = tmp_path / DEFAULT_FILE
 
         serdes.dump([{"version": version, "changes": changes}], file)
@@ -66,9 +69,10 @@ class TestLoad:
         ):
             serdes.load(file)
 
+    # debes agregar multiline a la estrategia
     @BASE_SETTINGS
     @given(version=sts.version_strings, message=sts.random_string)
-    def test_load_multiline_change_continuation(self, version, message, tmp_path):
+    def test_load_multiline_changes(self, version, message, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(f"{version}\n- {message}\n line another line", encoding="utf-8")
 
@@ -77,9 +81,9 @@ class TestLoad:
 
         assert result[-1]["changes"][0] == expected
 
-
+# y por que no load cuando es valido?
 class TestDump:
-    def test_dump_unreleased_empty_changes(self, tmp_path):
+    def test_dump_nothing(self, tmp_path):
         file = tmp_path / "changelog.txt"
         entries: list[version_tools.VersionEntry] = [{"version": "", "changes": []}]
 
