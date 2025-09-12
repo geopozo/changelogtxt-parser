@@ -23,10 +23,6 @@ class TestRoundtrip:
     ):
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
-        entries.insert(0, {"version": "", "changes": []})
-        # buen punto por un comentario
-        # por que necesitamos esta linea
-        # pero dump y load funciona sin esto?
 
         serdes.dump(entries, file)
         loaded = serdes.load(file)
