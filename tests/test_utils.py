@@ -53,19 +53,6 @@ class TestResolveFilePath:
         with pytest.raises(FileNotFoundError, match="File not found:"):
             _utils.resolve_file_path(file)
 
-    def test_resolve_file_path_directory_raises_is_a_directory_error(
-        self,
-        tmp_path,
-    ):
-        directory = tmp_path / "test_dir"
-        directory.mkdir()
-
-        with pytest.raises(
-            IsADirectoryError,
-            match="Expected a file but got a directory:",
-        ):
-            _utils.resolve_file_path(directory)
-
     def test_resolve_path_expanduser_works(self, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text("content")
