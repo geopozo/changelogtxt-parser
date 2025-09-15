@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import textwrap
+
 from changelogtxt_parser import _utils
 from changelogtxt_parser import version as version_tools
 
@@ -79,7 +81,16 @@ def dump(
         changes = entry["changes"]
 
         section = [f"v{_s!s}"] if (_s := version_tools.parse_version(version)) else []
-        section.extend([f"- {change}" for change in changes])
+
+        for change in changes:
+            wrapped = textwrap.fill(
+                change,
+                width=88,
+                initial_indent="- ",
+                subsequent_indent="  ",
+            )
+            section.append(wrapped)
+
         changelog.append("\n".join(section))
 
     content: str = "\n\n".join(changelog) + "\n"
