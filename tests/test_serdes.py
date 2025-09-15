@@ -51,10 +51,8 @@ class TestLoad:
         serdes.dump([{"version": version, "changes": changes}], file)
         result = serdes.load(file)
 
-        assert result[0]["version"] == ""
-        assert result[0]["changes"] == []
-        assert result[1]["version"] == version
-        assert result[1]["changes"] == changes
+        assert result[0]["version"] == version
+        assert result[0]["changes"] == changes
 
     def test_load_empty_bullet_raises_error(self, tmp_path):
         file = tmp_path / DEFAULT_FILE

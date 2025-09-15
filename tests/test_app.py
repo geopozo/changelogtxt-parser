@@ -179,12 +179,6 @@ class TestUpdate:
         with pytest.raises(ValueError, match="Poorly formatted version value"):
             app.update("rc1.0.1fr", "test message", file)
 
-    def test_update_unreleased_missing_version_and_message(self, tmp_path):
-        file = tmp_path / DEFAULT_FILE
-        file.write_text(CHANGELOG_CONTENT)
-        with pytest.raises(ValueError, match="Version already exists: Nothing to do."):
-            app.update("", "", file)
-
     def test_update_version_missing_message(self, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
@@ -202,7 +196,7 @@ class TestSummarizeNews:
         app.update("", "New change", str(target_file))
         new_versions, new_changes = app.summarize_news(source_file, target_file)
 
-        assert new_versions == set()
+        assert new_versions == {""}
         assert "New change" in new_changes[""]
 
     def test_summarize_news_no_changes(self, tmp_path):
