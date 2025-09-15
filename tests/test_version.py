@@ -10,7 +10,7 @@ BASE_SETTINGS = settings(max_examples=30)
 
 class TestParseVersion:
     @BASE_SETTINGS
-    @given(version=sts.version_strings)
+    @given(version=sts.version_st)
     def test_parse_version_with_v_prefix_returns_parsed_version(self, version):
         result = version_tools.parse_version(version)
 

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import textwrap
+
 from changelogtxt_parser import _utils
 from changelogtxt_parser import version as version_tools
 
@@ -17,13 +19,11 @@ def load(file_path: str) -> list[version_tools.VersionEntry]:
         A list of `VersionEntry` with changelog data
 
     """
-    file = _utils.resolve_path(file_path)
+    file = _utils.resolve_file_path(file_path)
 
     with file.open("r", encoding="utf-8") as f:
-        changelog: list[version_tools.VersionEntry] = [
-            {"version": "", "changes": []}, # si?
-        ]
-        current_entry: version_tools.VersionEntry = changelog[-1]
+        changelog: list[version_tools.VersionEntry] = []
+        current_entry: version_tools.VersionEntry | None = None
 
         for line_no, raw in enumerate(f, start=1):
             line = raw.strip()
@@ -40,9 +40,16 @@ def load(file_path: str) -> list[version_tools.VersionEntry]:
                         f"Invalid changelog format at line {line_no}: "
                         f'Expected content after "-"',
                     )
+
+                if not current_entry:
+                    current_entry = {"version": "", "changes": []}
+                    changelog.append(current_entry)
+
                 current_entry["changes"].append(change)
-            elif changes := current_entry["changes"]:
-                changes[-1] += f" {line}"
+
+            elif current_entry and current_entry["changes"]:
+                current_entry["changes"][-1] += f" {line}"
+
             else:
                 raise ValueError(
                     f"Invalid changelog format at line {line_no}: "
@@ -66,17 +73,24 @@ def dump(
         file_path: Path to the file where the changelog will be written.
 
     """
-    file = _utils.resolve_path(file_path, touch=True)
+    file = _utils.resolve_file_path(file_path, touch=True)
 
     changelog = []
     for entry in entries:
         version = entry["version"]
         changes = entry["changes"]
 
-        section = (
-            [str(f"v{_s}")] if (_s := version_tools.parse_version(version)) else []
-        )
-        section.extend([f"- {change}" for change in changes])
+        section = [f"v{_s!s}"] if (_s := version_tools.parse_version(version)) else []
+
+        for change in changes:
+            wrapped = textwrap.fill(
+                change,
+                width=88,
+                initial_indent="- ",
+                subsequent_indent="  ",
+            )
+            section.append(wrapped)
+
         changelog.append("\n".join(section))
 
     content: str = "\n\n".join(changelog) + "\n"
