@@ -78,9 +78,7 @@ def dump(
         version = entry["version"]
         changes = entry["changes"]
 
-        section = (
-            [str(f"v{_s}")] if (_s := version_tools.parse_version(version)) else []
-        )
+        section = [f"v{_s!s}"] if (_s := version_tools.parse_version(version)) else []
         section.extend([f"- {change}" for change in changes])
         changelog.append("\n".join(section))
 

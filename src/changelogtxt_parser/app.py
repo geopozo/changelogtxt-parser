@@ -39,7 +39,6 @@ def update(
             if not force:
                 raise ValueError("Cannot overwrite an existing version.")
             if not message:
-                # fatal? o warning
                 raise ValueError("Version already exists: Nothing to do.")
             current_changes = entry["changes"]
             break
@@ -48,8 +47,9 @@ def update(
             0,
             {
                 "version": f"v{new_version!s}",
-                "changes": entries.pop(0)["changes"],
-                # vamos a cambiar load para no incluir esto
+                "changes": entries.pop(0)["changes"]
+                if new_version and entries[0]["version"] == ""
+                else [],
             },
         )
         current_changes = entries[0]["changes"]
