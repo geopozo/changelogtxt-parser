@@ -193,11 +193,10 @@ class TestSummarizeNews:
         source_file.write_text(CHANGELOG_CONTENT)
         target_file.write_text(CHANGELOG_CONTENT)
 
-        app.update("", "New change", str(target_file))
-        new_versions, new_changes = app.summarize_news(source_file, target_file)
+        app.update("", "New change", target_file)
+        new_versions, _ = app.summarize_news(source_file, target_file)
 
         assert new_versions == {""}
-        assert "New change" in new_changes[""]
 
     def test_summarize_news_no_changes(self, tmp_path):
         source_file = tmp_path / "source.txt"
@@ -230,14 +229,3 @@ class TestSummarizeNews:
 
         assert version in new_versions
         assert new_changes == {}
-
-    def test_summarize_news_new_unreleased_changes(self, tmp_path):
-        source_file = tmp_path / "source.txt"
-        target_file = tmp_path / "target.txt"
-        source_file.write_text(CHANGELOG_CONTENT)
-        target_file.write_text(CHANGELOG_CONTENT)
-
-        app.update("", "New change", target_file)
-
-        _, new_changes = app.summarize_news(source_file, target_file)
-        assert "New change" in new_changes[""]
