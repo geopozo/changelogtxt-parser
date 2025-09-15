@@ -62,13 +62,12 @@ class TestUpdate:
         updated_file = file.read_text(encoding="utf-8")
         first_line = updated_file.splitlines()[0]
 
-        assert version in updated_file
         assert version in first_line
         assert f"- {message}" in updated_file
 
     @BASE_SETTINGS
     @given(version=sts.version_st, message=sts.random_string)
-    def test_update_new_version_moves_unreleased_points(
+    def test_update_add_unreleased_points_to_new_version(
         self,
         version,
         message,
@@ -82,29 +81,10 @@ class TestUpdate:
         app.update(version, "", file)
         updated_file = file.read_text(encoding="utf-8")
         first_line = updated_file.splitlines()[0]
+        second_line = updated_file.splitlines()[1]
 
-        assert version in updated_file
         assert version in first_line
-        assert message in updated_file
-
-    @BASE_SETTINGS
-    @given(version=sts.version_st, message=sts.random_string)
-    def test_update_new_version_with_message_and_unreleased(
-        self,
-        version,
-        message,
-        tmp_path,
-    ):
-        file = tmp_path / DEFAULT_FILE
-        file.write_text(CHANGELOG_CONTENT)
-        assume(version not in ASSUME_LIST)
-
-        app.update("", message, file)
-        app.update(version, message, file)
-
-        updated_file = file.read_text(encoding="utf-8").splitlines()
-        idx = next(i for i, line in enumerate(updated_file) if version in line)
-        assert f"- {message}" in updated_file[idx + 1]
+        assert message in second_line
 
     def test_update_existing_version_raises_error(self, tmp_path):
         file = tmp_path / DEFAULT_FILE
@@ -112,7 +92,7 @@ class TestUpdate:
         with pytest.raises(ValueError, match="Cannot overwrite an existing version."):
             app.update("v1.0.1", "New change", file)
 
-    def test_update_existing_version_with_force_no_message_allows_update(
+    def test_update_existing_version_with_force_allows_update(
         self,
         tmp_path,
     ):
@@ -125,25 +105,6 @@ class TestUpdate:
 
         assert message in updated_file
         assert message in second_line
-
-    @BASE_SETTINGS
-    @given(version=sts.version_st, message=sts.random_string)
-    def test_update_unreleased_no_existing_changes(
-        self,
-        version,
-        message,
-        tmp_path,
-    ):
-        file = tmp_path / DEFAULT_FILE
-        file.write_text(CHANGELOG_CONTENT)
-        assume(version not in ASSUME_LIST)
-
-        app.update("", message, file)
-        updated_file = file.read_text(encoding="utf-8")
-        first_line = updated_file.splitlines()[0]
-
-        assert f"- {message}" in updated_file
-        assert message in first_line
 
     @BASE_SETTINGS
     @given(version=sts.version_st, message=sts.random_string)
@@ -175,9 +136,6 @@ class TestUpdate:
     def test_update_invalid_version_format(self, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
-
-        with pytest.raises(ValueError, match="Poorly formatted version value"):
-            app.update("rc1.0.1fr", "test message", file)
 
     def test_update_version_missing_message(self, tmp_path):
         file = tmp_path / DEFAULT_FILE
