@@ -26,7 +26,7 @@ def update(
 
     Raises:
         ValueError: If parsing version fails.
-        ValueError: If attempting to adding changes to an existing version without
+        RuntimeError: If attempting to adding changes to an existing version without
             force.
 
     """
@@ -45,7 +45,7 @@ def update(
     for entry in entries:
         if new_version.removeprefix("v") == entry["version"].removeprefix("v"):
             if not force:
-                raise ValueError("Cannot overwrite an existing version.")
+                raise RuntimeError("Cannot overwrite an existing version.")
             if not message:
                 raise ValueError("Version already exists: Nothing to do.")
             current_changes = entry["changes"]
