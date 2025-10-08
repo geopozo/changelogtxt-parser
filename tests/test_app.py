@@ -89,7 +89,7 @@ class TestUpdate:
     def test_update_existing_version_raises_error(self, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
-        with pytest.raises(ValueError, match="Cannot overwrite an existing version."):
+        with pytest.raises(RuntimeError, match="Cannot overwrite an existing version."):
             app.update("v1.0.1", "New change", file)
 
     def test_update_existing_version_with_force_allows_update(
