@@ -1,8 +1,8 @@
-import logging
 import pathlib
 
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
-logger = logging.getLogger(__name__)
+import logistro
+
+_logger = logistro.getLogger(__name__)
 
 
 def resolve_file_path(
@@ -21,7 +21,7 @@ def resolve_file_path(
     if touch:
         file_path.touch()
     elif not file_path.is_file():
-        raise FileNotFoundError(f"File not found: {file_path}")
+        raise FileNotFoundError(f"File not found: {file_path!s}")
 
-    logger.info(f"File found in: {file_path}")
+    _logger.info(f"File found in: {file_path!s}")
     return file_path
