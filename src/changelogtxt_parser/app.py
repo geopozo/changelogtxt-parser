@@ -51,16 +51,13 @@ def update(
             current_changes = entry["changes"]
             break
     else:
-        entries.insert(
-            0,
-            {
-                "version": new_version,
-                "changes": entries.pop(0)["changes"]
-                if new_version and entries[0]["version"] == ""
-                else [],
-            },
-        )
-        current_changes = entries[0]["changes"]
+        should_absorb_unreleased = new_version and entries[0]["version"] == ""
+        new_entry: version_tools.VersionEntry = {
+            "version": new_version,
+            "changes": entries.pop(0)["changes"] if should_absorb_unreleased else [],
+        }
+        entries.insert(0, new_entry)
+        current_changes = new_entry["changes"]
     if message:
         current_changes.insert(0, message)
 
