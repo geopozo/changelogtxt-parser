@@ -32,7 +32,6 @@ def update(
     """
     if not version:
         new_version = ""
-        force = True
     elif strict:
         if not (parsed := version_tools.parse_version(version)):
             raise ValueError(f"Poorly formatted version value {version}")
@@ -44,7 +43,7 @@ def update(
 
     for entry in entries:
         if new_version.removeprefix("v") == entry["version"].removeprefix("v"):
-            if not force:
+            if not force and new_version:
                 raise RuntimeError("Cannot overwrite an existing version.")
             if not message:
                 raise ValueError("Version already exists: Nothing to do.")
