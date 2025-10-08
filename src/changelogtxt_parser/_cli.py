@@ -3,7 +3,7 @@ import pprint
 import sys
 from typing import Any
 
-from changelogtxt_parser import _utils, app, serdes
+from changelogtxt_parser import app, serdes
 
 # ruff: noqa: T201 allow print in CLI
 
@@ -96,6 +96,11 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         action="store_true",
         help="Force update of an existing version",
     )
+    update.add_argument(
+        "--strict",
+        action="store_true",
+        help="Force parse the version",
+    )
 
     basic_args = parser.parse_args()
     return parser, vars(basic_args)
@@ -109,16 +114,15 @@ def run_cli() -> None:
     target_file = cli_args.pop("target", "")
     message = cli_args.pop("message", None)
     force = cli_args.pop("force", "")
+    strict = cli_args.pop("strict", "")
     command = cli_args.pop("command", None)
 
     match command:
         case "check-tag":
-            file = _utils.resolve_file_path(file)
-            app.check_tag(tag, str(file))
+            app.check_tag(tag, file)
             print(f"Tag validation for {tag} was successful.")
         case "check-format":
-            file = _utils.resolve_file_path(file)
-            serdes.load(str(file))
+            serdes.load(file)
             print("Changelog format validation was successful.")
         case "summarize-news":
             diff = app.summarize_news(source_file, target_file)
@@ -128,8 +132,7 @@ def run_cli() -> None:
                 print("No changes found", file=sys.stderr)
                 sys.exit(1)
         case "update":
-            file = _utils.resolve_file_path(file)
-            app.update(tag, message, str(file), force=force)
+            app.update(tag, message, file, force=force, strict=strict)
             print(f"File update was successful and generated at: {file}")
         case _:
             print("No command supplied.", file=sys.stderr)
