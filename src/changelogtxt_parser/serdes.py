@@ -61,6 +61,8 @@ def load(file_path: str) -> list[version_tools.VersionEntry]:
 def dump(
     entries: list[version_tools.VersionEntry],
     file_path: str,
+    *,
+    strict: bool = False,
 ) -> None:
     """
     Write a formatted changelog to the specified file path.
@@ -71,6 +73,8 @@ def dump(
         entries: A list of `VersionEntry` objects, each containing a version
             string and associated changes.
         file_path: Path to the file where the changelog will be written.
+        strict: If True, attempts to parse the version string for each entry.
+            Defaults to False.
 
     """
     file = _utils.resolve_file_path(file_path, touch=True)
@@ -80,7 +84,12 @@ def dump(
         version = entry["version"]
         changes = entry["changes"]
 
-        section = [f"v{_s!s}"] if (_s := version_tools.parse_version(version)) else []
+        if strict:
+            section = (
+                [f"v{_s!s}"] if (_s := version_tools.parse_version(version)) else []
+            )
+        else:
+            section = [version] if version else []
 
         for change in changes:
             wrapped = textwrap.fill(
