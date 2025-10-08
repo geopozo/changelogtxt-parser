@@ -28,10 +28,8 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         help="Checks if a tag in the changelog matches the specified tag.",
     )
     check_tag.add_argument(
-        "-t",
-        "--tag",
+        "tag",
         help="Tag name is required.",
-        required=True,
     )
     check_tag.add_argument(
         "-f",
