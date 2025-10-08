@@ -3,6 +3,8 @@ import pprint
 import sys
 from typing import Any
 
+import logistro
+
 from changelogtxt_parser import app, serdes
 
 # ruff: noqa: T201 allow print in CLI
@@ -16,6 +18,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
 
     parser = argparse.ArgumentParser(
         add_help=True,
+        parents=[logistro.parser],
         conflict_handler="resolve",
         description=description,
     )
