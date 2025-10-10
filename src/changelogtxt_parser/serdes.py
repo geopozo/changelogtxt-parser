@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import textwrap
+import warnings
 
 from changelogtxt_parser import _utils
 from changelogtxt_parser import version as version_tools
@@ -85,9 +86,16 @@ def dump(
         changes = entry["changes"]
 
         if strict:
-            section = (
-                [f"v{_s!s}"] if (_s := version_tools.parse_version(version)) else []
-            )
+            parsed = version_tools.parse_version(version)
+            if not parsed:
+                raise ValueError(f"Invalid version format: {version!r}")
+            elif isinstance(parsed, version_tools.BadVersion):
+                warnings.warn(
+                    f"Bad version detected: {version!r}.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+            section = [f"v{version!s}"]
         else:
             section = [version] if version else []
 
