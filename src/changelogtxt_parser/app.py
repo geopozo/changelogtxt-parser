@@ -41,6 +41,9 @@ def update(
 
     entries = serdes.load(file_path)
 
+    if not entries:
+        entries: list[version_tools.VersionEntry] = [{"version": "", "changes": []}]
+
     for entry in entries:
         if new_version.removeprefix("v") == entry["version"].removeprefix("v"):
             if not force and new_version:
