@@ -88,10 +88,10 @@ def dump(
         if strict:
             parsed = version_tools.parse_version(version)
             if not parsed:
-                raise ValueError(f"Invalid version format: {version!r}")
+                raise ValueError(f"Invalid version format: {version!s}")
             elif isinstance(parsed, version_tools.BadVersion):
                 warnings.warn(
-                    f"Bad version detected: {version!r}.",
+                    f"Bad version detected: {version!s}.",
                     UserWarning,
                     stacklevel=2,
                 )
