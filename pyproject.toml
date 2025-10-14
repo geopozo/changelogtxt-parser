@@ -20,6 +20,7 @@ authors = [
 ]
 maintainers = [{ name = "Andrew Pikul", email = "ajpikul@gmail.com" }]
 dependencies = [
+  "logistro>=1.1.0",
   "packaging>=25.0",
   "semver>=3.0.4",
 ]
@@ -33,8 +34,10 @@ changelogtxt = "changelogtxt_parser._cli:run_cli"
 
 [dependency-groups]
 dev = [
+  "hypothesis>=6.138.14",
   "mypy>=1.17.1",
   "pytest>=8.4.1",
+  "pytest-cov>=7.0.0",
   "pytest-xdist>=3.8.0",
 ]
 
@@ -68,6 +71,10 @@ ignore = [
 
 [tool.pytest.ini_options]
 log_cli = true
+addopts = "--cov=src/changelogtxt_parser --cov-report html tests/"
+
+[tool.coverage.run]
+omit = ["src/changelogtxt_parser/_cli.py"]
 
 [tool.mypy]
 files = ["src/changelogtxt_parser"]

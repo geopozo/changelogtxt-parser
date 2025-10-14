@@ -15,8 +15,8 @@ class VersionEntry(TypedDict):
     Represents a single changelog entry.
 
     Attributes:
-        version (str): The version number or tag associated with the changes.
-        changes (list[str]): A list of change descriptions for the specified version.
+        version: The version number or tag associated with the changes.
+        changes: A list of change descriptions for the specified version.
 
     """
 
@@ -103,19 +103,16 @@ def parse_version(version: str) -> _VersionTypes:
 
     """
     version = version.removeprefix("v")
-    v: _VersionTypes = None
     try:
-        v = pyversion.Version(version)
+        return pyversion.Version(version)
     except pyversion.InvalidVersion:
         pass
     try:
-        v = semver.Version.parse(version)
+        return semver.Version.parse(version)
     except ValueError:
         pass
     try:
-        v = BadVersion(version)
+        return BadVersion(version)
     except ValueError:
         pass
-    if not v:
-        return None
-    return v
+    return None
