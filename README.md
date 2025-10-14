@@ -4,7 +4,7 @@
 	<img
         height="250"
 		alt="changelogtxt_small"
-		src="./logo.png">
+		src="docs/media/logo.png">
 </h1>
 
 ## Overview
