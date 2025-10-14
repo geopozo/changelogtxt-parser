@@ -1,6 +1,6 @@
 from hypothesis import strategies as st
 
-version_strings = st.builds(
+version_st = st.builds(
     lambda major, minor, patch, post, dev: f"v{major}.{minor}.{patch}{post}{dev}",
     major=st.integers(min_value=0, max_value=99),
     minor=st.integers(min_value=0, max_value=99),
@@ -21,15 +21,15 @@ random_string = st.text(
     max_size=16,
 )
 
-list_of_strings = st.lists(random_string, min_size=2, max_size=10, unique=True)
+list_of_strings = st.lists(random_string, min_size=2, max_size=10)
 
 list_of_version_entries = st.one_of(
     st.just([]),
     st.lists(
         st.builds(
-            lambda version, change: {"version": version, "changes": [change]},
-            version=version_strings,
-            change=random_string,
+            lambda version, changes: {"version": version, "changes": changes},
+            version=version_st,
+            changes=list_of_strings,
         ),
         min_size=2,
         max_size=10,
