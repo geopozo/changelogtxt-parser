@@ -1,8 +1,11 @@
 import argparse
+import pprint
 import sys
 from typing import Any
 
-from changelogtxt_parser import _utils, app, serdes
+import logistro
+
+from changelogtxt_parser import app, serdes
 
 # ruff: noqa: T201 allow print in CLI
 
@@ -15,6 +18,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
 
     parser = argparse.ArgumentParser(
         add_help=True,
+        parents=[logistro.parser],
         conflict_handler="resolve",
         description=description,
     )
@@ -27,17 +31,15 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         help="Checks if a tag in the changelog matches the specified tag.",
     )
     check_tag.add_argument(
-        "-t",
-        "--tag",
+        "tag",
         help="Tag name is required.",
-        required=True,
     )
     check_tag.add_argument(
         "-f",
         "--file",
         help="Optional file path.",
         required=False,
-        default="./",
+        default="./CHANGELOG.txt",
     )
 
     check_format = subparsers.add_parser(
@@ -50,7 +52,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "--file",
         help="Optional file path.",
         required=False,
-        default="./",
+        default="./CHANGELOG.txt",
     )
 
     compare_files = subparsers.add_parser(
@@ -88,16 +90,21 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "--file",
         help="Optional file path.",
         required=False,
-        default="./",
+        default="./CHANGELOG.txt",
     )
     update.add_argument(
         "--force",
         action="store_true",
         help="Force update of an existing version",
     )
+    update.add_argument(
+        "--strict",
+        action="store_true",
+        help="Force parse the version",
+    )
 
-    basic_args = parser.parse_args() # no es lo mejor, no recuerdo por qué
-    return parser, vars(basic_args) # es necessario usar vars()?
+    basic_args = parser.parse_args()
+    return parser, vars(basic_args)
 
 
 def run_cli() -> None:
@@ -108,27 +115,25 @@ def run_cli() -> None:
     target_file = cli_args.pop("target", "")
     message = cli_args.pop("message", None)
     force = cli_args.pop("force", "")
+    strict = cli_args.pop("strict", "")
     command = cli_args.pop("command", None)
 
     match command:
         case "check-tag":
-            file = _utils.find_file(file)
             app.check_tag(tag, file)
             print(f"Tag validation for {tag} was successful.")
         case "check-format":
-            file = _utils.find_file(file)
             serdes.load(file)
             print("Changelog format validation was successful.")
         case "summarize-news":
             diff = app.summarize_news(source_file, target_file)
             if any(diff):
-                print(diff) # acá sería el punto de ponerlo bonito
+                pprint.pp(diff)
             else:
                 print("No changes found", file=sys.stderr)
                 sys.exit(1)
         case "update":
-            file = _utils.find_file(file)
-            app.update(tag, message, file, force=force)
+            app.update(tag, message, file, force=force, strict=strict)
             print(f"File update was successful and generated at: {file}")
         case _:
             print("No command supplied.", file=sys.stderr)

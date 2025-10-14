@@ -10,6 +10,7 @@ def update(
     file_path: str = "./CHANGELOG.txt",
     *,
     force: bool = False,
+    strict: bool = False,
 ) -> None:
     """
     Create a new version entry if it doesn't exist.
@@ -20,41 +21,48 @@ def update(
         file_path: Path to the changelog file to be updated.
         force: If True, allows adding changes to an existing version.
             Defaults to False.
+        strict: If True, attempts to parse the version string for each entry.
+            Defaults to False.
 
     Raises:
         ValueError: If parsing version fails.
-        ValueError: If attempting to adding changes to an existing version without
+        RuntimeError: If attempting to adding changes to an existing version without
             force.
 
     """
     if not version:
         new_version = ""
-        force = True
-    elif not (new_version := version_tools.parse_version(version)):
-        raise ValueError(f"Poorly formatted version value {version}")
+    elif strict:
+        if not (parsed := version_tools.parse_version(version)):
+            raise ValueError(f"Poorly formatted version value {version}")
+        new_version = f"v{parsed}"
+    else:
+        new_version = version
 
     entries = serdes.load(file_path)
+
+    if not entries:
+        entries: list[version_tools.VersionEntry] = [{"version": "", "changes": []}]
+
     for entry in entries:
-        if str(new_version) == entry["version"].removeprefix("v"):
-            if not force:
-                raise ValueError("Cannot overwrite an existing version.")
+        if new_version.removeprefix("v") == entry["version"].removeprefix("v"):
+            if not force and new_version:
+                raise RuntimeError("Cannot overwrite an existing version.")
             if not message:
-                # fatal? o warning
                 raise ValueError("Version already exists: Nothing to do.")
             current_changes = entry["changes"]
             break
     else:
-        entries.insert(
-            0,
-            {
-                "version": f"v{new_version!s}",
-                "changes": entries.pop(0)["changes"],
-                # vamos a cambiar load para no incluir esto
-            },
-        )
-        current_changes = entries[0]["changes"]
+        should_absorb_unreleased = new_version and entries[0]["version"] == ""
+        new_entry: version_tools.VersionEntry = {
+            "version": new_version,
+            "changes": entries.pop(0)["changes"] if should_absorb_unreleased else [],
+        }
+        entries.insert(0, new_entry)
+        current_changes = new_entry["changes"]
     if message:
         current_changes.insert(0, message)
+
     serdes.dump(entries, file_path)
 
 
