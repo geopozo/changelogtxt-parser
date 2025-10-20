@@ -16,11 +16,11 @@ inputs:
     required: false
     default: "true"
   tag-check:
-    description: "Tag to verify"
+    description: "If a version number supplied, ensure changelogtxt-parser contains it."
     required: false
     default: ""
   summarize-news:
-    description: "Origin and target file paths separated by a space"
+    description: "Supply an origin and destination (branch? file? what?) to print the novelties."
     required: false
     default: ""
 

@@ -17,6 +17,51 @@ Changelogtxt-parser is a lightweight Python utility designed to help you manage 
 - Add a new tag.
 - Add a new unreleased entry.
 
+### CHANGELOG.txt format
+
+The format expected is each version proceede by a v:
+
+```txt
+v1.02
+v0.40
+```
+
+where each version number is either semvar or python packaging (can be adjusted by strictness).
+
+Actual changelog entries should be a dash-bulleted list of points. Here is a valid example:
+
+```txt
+- This is an unreleased point
+v1.02
+v1.02rc0
+- This is where we aded something
+  and it is multi-line to boot!
+```
+
+## Use in github actions
+
+```yml
+- name: Changelog check
+  id: changelog
+  uses: geopozo/changelogtxt-parser@main
+  with:
+    working-directory: ./src/py
+    tag-check: tag-pushed o algo? (o string)
+    summarize-news: pr-to-default (algo mas facil?) . main:src/py/ <-- como se especifica in git
+```
+mangers de escribir rutas
+path:
+branch:path
+repo:branch:path
+repo:path ? (no, se puede confunidr on branch:path
+o
+
+path
+@branch:path
+repo@branch:path
+repo:path <-- usa default
+
+
 ## Installation
 
 You can use Changelogtxt-parser in two ways:
