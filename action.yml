@@ -46,7 +46,7 @@ runs:
       env:
         TAG: ${{ github.ref_name }}
         IS_TAG: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
-      if: ${{ fromJSON(inputs.from-push) && env.IS_TAG }}
+      if: ${{ fromJSON(inputs.from-push) && fromJSON(env.IS_TAG) }}
       shell: bash
       run: |
         set -euo pipefail
