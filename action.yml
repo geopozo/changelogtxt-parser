@@ -43,16 +43,16 @@ runs:
           -f ${{ inputs.working-directory }}
     - id: tag
       name: Check tag
-      if: >
-        ${{ fromJSON(inputs.from-push) &&
-            github.event_name == 'push' &&
-            startsWith(github.ref, 'refs/tags/') }}
+      env:
+        TAG: ${{ github.ref_name }}
+        IS_TAG: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+      if: ${{ fromJSON(inputs.from-push) && env.IS_TAG }}
       shell: bash
       run: |
         set -euo pipefail
         echo "Checking tag..."
-        uv run --with '${{ github.action_path }}' \
-          changelogtxt check-tag ${GITHUB_REF_NAME} \
+        uv run --with "${{ github.action_path }}" \
+          changelogtxt check-tag "${{ env.TAG }}" \
           -f ${{ inputs.working-directory }}
     - id: summarize
       name: Summarize News
