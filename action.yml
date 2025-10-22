@@ -20,7 +20,9 @@ inputs:
     required: false
     default: ""
   summarize-news:
-    description: "Origin and target file paths separated by a space."
+    description: >
+      Use 'from-pr' for PRs, or set a target file path
+      (origin is defined by 'file-path').
     required: false
     default: ""
 
@@ -86,3 +88,16 @@ runs:
 
         uv run --with '${{ github.action_path }}' \
           changelogtxt summarize-news origin.txt target.txt
+
+    - id: summarize
+      name: Summarize news
+      env:
+        SUMMARIZE: ${{ inputs.summarize-news }}
+        FILE_PATH: ${{ inputs.file-path }}
+      if: ${{ env.SUMMARIZE != '' && env.SUMMARIZE != 'from-pr' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "Checking files"
+        uv run --with '${{ github.action_path }}' \
+          changelogtxt summarize-news $FILE_PATH $SUMMARIZE
