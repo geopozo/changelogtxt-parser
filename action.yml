@@ -7,10 +7,10 @@ inputs:
     description: "Python version to use with uv"
     required: false
     default: "3.12"
-  working-directory:
-    description: "Directory where the command will be executed"
+  file-path:
+    description: "Path to the changelog file to process"
     required: false
-    default: "."
+    default: "./CHANGELOG.txt"
   format-check:
     description: "Whether to run the check-format step (boolean)"
     required: false
@@ -44,7 +44,7 @@ runs:
         echo "Checking format..."
         uv run --with '${{ github.action_path }}' \
           changelogtxt check-format \
-          -f ${{ inputs.working-directory }}
+          -f ${{ inputs.file-path }}
 
     - id: tag-push
       name: Check pushed tag
@@ -56,7 +56,7 @@ runs:
         echo "Checking tag..."
         uv run --with "${{ github.action_path }}" \
           changelogtxt check-tag "${{ github.ref_name }}" \
-          -f "${{ inputs.working-directory }}"
+          -f "${{ inputs.file-path }}"
 
     - id: tag
       name: Check tag
@@ -66,12 +66,11 @@ runs:
         echo "Checking tag..."
         uv run --with "${{ github.action_path }}" \
           changelogtxt check-tag "${{ env.TAG }}" \
-          -f ${{ inputs.working-directory }}
+          -f ${{ inputs.file-path }}
 
     - id: summarize
       name: Summarize News
       if: ${{ inputs.summarize-news != '' }}
-      working-directory: ${{ inputs.working-directory }}
       shell: bash
       run: |
         set -euo pipefail
