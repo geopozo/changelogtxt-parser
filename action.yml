@@ -21,8 +21,7 @@ inputs:
     default: ""
   summarize-news:
     description: >
-      Use 'from-pr' for PRs, or provide a JSON array with two file paths
-      like ["origin.txt","target.txt"].
+      Use 'from-pr' for PRs, or provide ["<file_path>","<target_branch>"].
     required: false
     default: ""
 
@@ -98,7 +97,11 @@ runs:
       run: |
         set -euo pipefail
         echo "Checking files"
-        ORIGIN_FILE=$(echo "$SUMMARIZE" | jq -r '.[0]')
-        TARGET_FILE=$(echo "$SUMMARIZE" | jq -r '.[1]')
+
+        FILE_PATH=$(echo "$SUMMARIZE" | jq -r '.[0]')
+        TARGET_BRANCH=$(echo "$SUMMARIZE" | jq -r '.[1]')
+
+        git show "origin/$TARGET_BRANCH:$FILE_PATH" > target.txt
+
         uv run --with '${{ github.action_path }}' \
-          changelogtxt summarize-news "$ORIGIN_FILE" "$TARGET_FILE"
+          changelogtxt summarize-news "$FILE_PATH" target.txt
