@@ -21,8 +21,8 @@ inputs:
     default: ""
   summarize-news:
     description: >
-      Use 'from-pr' for PRs, or set a target file path
-      (origin is defined by 'file-path').
+      Use 'from-pr' for PRs, or provide a JSON array with two file paths
+      like ["origin.txt","target.txt"].
     required: false
     default: ""
 
@@ -93,11 +93,15 @@ runs:
       name: Summarize news
       env:
         SUMMARIZE: ${{ inputs.summarize-news }}
-        FILE_PATH: ${{ inputs.file-path }}
       if: ${{ env.SUMMARIZE != '' && env.SUMMARIZE != 'from-pr' }}
       shell: bash
       run: |
         set -euo pipefail
         echo "Checking files"
+
+        readarray -t FILES < <(echo "$SUMMARIZE" | jq -r '.[]')
+        ORIGIN_FILE="${FILES[0]}"
+        TARGET_FILE="${FILES[1]}"
+
         uv run --with '${{ github.action_path }}' \
-          changelogtxt summarize-news $FILE_PATH $SUMMARIZE
+          changelogtxt summarize-news "$ORIGIN_FILE" "$TARGET_FILE"
