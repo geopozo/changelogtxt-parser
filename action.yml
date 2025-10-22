@@ -11,7 +11,7 @@ inputs:
     description: "Path to the changelog file to process"
     required: false
     default: "./CHANGELOG.txt"
-  format-check:
+  check-format:
     description: "Whether to run the check-format step (boolean)"
     required: false
     default: "true"
@@ -38,7 +38,7 @@ runs:
 
     - id: format
       name: Check format
-      if: ${{ fromJSON(inputs.format-check) }}
+      if: ${{ fromJSON(inputs.check-format) }}
       shell: bash
       run: |
         echo "Checking format..."
