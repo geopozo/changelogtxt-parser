@@ -42,6 +42,18 @@ runs:
           changelogtxt check-format \
           -f ${{ inputs.working-directory }}
 
+    - id: tag-push
+      name: Check pushed tag
+      env:
+        IS_PUSH: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+      if: ${{ inputs.check-tag == 'from-push' && env.IS_PUSH == 'true' }}
+      shell: bash
+      run: |
+        echo "Checking tag..."
+        uv run --with "${{ github.action_path }}" \
+          changelogtxt check-tag "${{ github.ref_name }}" \
+          -f "${{ inputs.working-directory }}"
+
     - id: tag
       name: Check tag
       if: ${{ inputs.check-tag != '' && inputs.check-tag != 'from-push' }}
