@@ -81,6 +81,56 @@ options:
                         fallback to system default)
 ```
 
+Examples:
+
+- Check tag:
+
+  ```console
+  uv run changelogtxt check-tag "v1.0.1"
+  ```
+
+  **output:**
+
+  ```console
+  Tag validation for v1.0.1 was successful.
+  ```
+
+- Check format
+
+  ```console
+  uv run changelogtxt check-format
+  ```
+
+  **output:**
+
+  ```console
+  Changelog format validation was successful.
+  ```
+
+- Update
+
+  ```console
+  uv run changelogtxt update -t "v1.0.2" -m "New release"
+  ```
+
+  **output:**
+
+  ```console
+  File update was successful and generated at: CHANGELOG.txt
+  ```
+
+- Summarize news
+
+  ```console
+  uv run changelogtxt summarize-news <origin> <target>
+  ```
+
+  **output:**
+
+  ```console
+  (set(), {'v1.0.2': {'New release'}})
+  ```
+
 </div>
 
 ## License
