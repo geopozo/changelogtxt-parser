@@ -9,6 +9,8 @@ from changelogtxt_parser import app, serdes
 
 # ruff: noqa: T201 allow print in CLI
 
+DEFAULT_FILE = "./CHANGELOG.txt"
+
 
 def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
     description = """changelogtxt helps you manage your changelog file.
@@ -39,7 +41,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "--file",
         help="Optional file path.",
         required=False,
-        default="./CHANGELOG.txt",
+        default=DEFAULT_FILE,
     )
 
     check_format = subparsers.add_parser(
@@ -52,7 +54,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "--file",
         help="Optional file path.",
         required=False,
-        default="./CHANGELOG.txt",
+        default=DEFAULT_FILE,
     )
 
     compare_files = subparsers.add_parser(
@@ -90,7 +92,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "--file",
         help="Optional file path.",
         required=False,
-        default="./CHANGELOG.txt",
+        default=DEFAULT_FILE,
     )
     update.add_argument(
         "--force",
