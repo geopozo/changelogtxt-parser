@@ -13,6 +13,6 @@ jobs:
         id: changelog
         uses: geopozo/changelogtxt-parser@main
         with:
-          check-tag: "from-push"
+          get-tag: "from-push"
           summarize-news: '["./CHANGELOG.txt", "main"]'
 ```

@@ -46,7 +46,7 @@ changelogtxt.dump(object)
 $ changelogtxt check-format
 
 # verify version exists
-$ changelogtxt check-tag v1.0.1
+$ changelogtxt get-tag v1.0.1
 
 # add new change or version
 $ changelogtxt update -t "v1.0.2" -m "Change"
@@ -70,8 +70,8 @@ $ changelogtxt summarize-news <origin> <target>
     # Whether to validate the changelog format (default: "true")
     check-format: "true"
 
-    # Tag to verify. Use "from-push" to check the tag from the latest push
-    check-tag: "v1.0.0"
+    # Tag to verify. Use "from-push" to get the tag from the latest push
+    get-tag: "v1.0.0"
 
     # Compare changelogs from current to provided branch
     summarize-news: '["<file_path>", "<target_branch>"]'
