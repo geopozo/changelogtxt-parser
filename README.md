@@ -7,8 +7,6 @@
 		src="docs/media/logo.png">
 </h1>
 
-<div class="termy">
-
 ## Overview
 
 Changelogtxt-parser is a python api, CLI, and github action for parsing and verifying a changelog.txt like this:
@@ -26,10 +24,10 @@ v0.1.0
 
 ### How to Install
 
-```console
-uv add git+https://github.com/geopozo/changelogtxt-parser
+```shell
+$ uv add git+https://github.com/geopozo/changelogtxt-parser
 # or
-pip install git+https://github.com/geopozo/changelogtxt-parser
+$ pip install git+https://github.com/geopozo/changelogtxt-parser
 ```
 
 ## Python API
@@ -43,14 +41,19 @@ changelogtxt.dump(object)
 
 ## CLI Examples
 
-| explanation               | command                                         |
-| ------------------------- | ----------------------------------------------- |
-| lint                      | `changelogtxt check-format`                     |
-| verify version exists     | `changelogtxt check-tag v1.0.1`                 |
-| add new change or version | `changelogtxt update -t "v1.0.2" -m "Change"`   |
-| compare two git ref files | `changelogtxt summarize-news <origin> <target>` |
+```shell
+# lint
+$ changelogtxt check-format
 
-</div>
+# verify version exists
+$ changelogtxt check-tag v1.0.1
+
+# add new change or version
+$ changelogtxt update -t "v1.0.2" -m "Change"
+
+# compare two git ref files
+$ changelogtxt summarize-news <origin> <target>
+```
 
 ## License
 
