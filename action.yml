@@ -66,7 +66,7 @@ runs:
       run: |
         echo "Checking tag..."
         uv run --with "${{ github.action_path }}" \
-          changelogtxt check-tag "${{ env.TAG }}" \
+          changelogtxt check-tag "${{ inputs.check-tag }}" \
           -f ${{ inputs.file-path }}
 
     - id: summarize-push
