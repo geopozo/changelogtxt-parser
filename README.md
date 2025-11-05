@@ -73,8 +73,9 @@ $ changelogtxt summarize-news <origin> <target>
     # Tag to verify. Use "from-push" to get the tag from the latest push
     get-tag: "v1.0.0"
 
-    # Compare changelogs from current to provided branch
-    summarize-news: '["<file_path>", "<target_branch>"]'
+    # Compare changelog files from the current ref to <target_ref> (branch, commit hash, or tag)
+    # <file_path> is relative to the `working-directory`
+    summarize-news: '["<file_path>", "<target_ref>"]'
 ```
 
 More info:
