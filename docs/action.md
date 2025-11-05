@@ -3,8 +3,17 @@
 # Setup action
 
 ```yaml
+on:
+  push:
+    tags:
+      - "*"
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - main
+
 name: Check Changelog
-  # puedes poner aca on: push toto eso
 jobs:
   changelog:
     runs-on: ubuntu-latest
