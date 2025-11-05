@@ -16,7 +16,7 @@ CHANGELOG_CONTENT = "v1.0.1\n- Fixed bug\n\nv1.0.0\n- Initial release"
 class TestCheckTag:
     @BASE_SETTINGS
     @given(version=sts.version_st, message=sts.random_string)
-    def test_check_tag_existing(
+    def test_get_tag_existing(
         self,
         version,
         message,
@@ -27,13 +27,14 @@ class TestCheckTag:
         assume(version not in ASSUME_LIST)
 
         app.update(version, message, file)
-        result = app.check_tag(version, file)
+        result = app.get_tag(version, file)
 
-        assert result is None
+        assert result["version"] == version
+        assert result["changes"][0] == message
 
     @BASE_SETTINGS
     @given(version=sts.version_st)
-    def test_check_tag_non_existing(self, version, tmp_path):
+    def test_get_tag_non_existing(self, version, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
         assume(version not in ASSUME_LIST)
@@ -42,7 +43,7 @@ class TestCheckTag:
             ValueError,
             match=(f"Tag '{version}' not found in changelog"),
         ):
-            app.check_tag(version, file)
+            app.get_tag(version, file)
 
 
 class TestUpdate:

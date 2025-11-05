@@ -9,6 +9,8 @@ from changelogtxt_parser import app, serdes
 
 # ruff: noqa: T201 allow print in CLI
 
+DEFAULT_FILE = "./CHANGELOG.txt"
+
 
 def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
     description = """changelogtxt helps you manage your changelog file.
@@ -25,21 +27,21 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
 
     subparsers = parser.add_subparsers(dest="command")
 
-    check_tag = subparsers.add_parser(
-        "check-tag",
+    get_tag = subparsers.add_parser(
+        "get-tag",
         description="Verify that a tag in the changelog matches the provided tag.",
         help="Checks if a tag in the changelog matches the specified tag.",
     )
-    check_tag.add_argument(
+    get_tag.add_argument(
         "tag",
         help="Tag name is required.",
     )
-    check_tag.add_argument(
+    get_tag.add_argument(
         "-f",
         "--file",
         help="Optional file path.",
         required=False,
-        default="./CHANGELOG.txt",
+        default=DEFAULT_FILE,
     )
 
     check_format = subparsers.add_parser(
@@ -52,7 +54,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "--file",
         help="Optional file path.",
         required=False,
-        default="./CHANGELOG.txt",
+        default=DEFAULT_FILE,
     )
 
     compare_files = subparsers.add_parser(
@@ -90,7 +92,7 @@ def _get_cli_args() -> tuple[argparse.ArgumentParser, dict[str, Any]]:
         "--file",
         help="Optional file path.",
         required=False,
-        default="./CHANGELOG.txt",
+        default=DEFAULT_FILE,
     )
     update.add_argument(
         "--force",
@@ -119,9 +121,10 @@ def run_cli() -> None:
     command = cli_args.pop("command", None)
 
     match command:
-        case "check-tag":
-            app.check_tag(tag, file)
-            print(f"Tag validation for {tag} was successful.")
+        case "get-tag":
+            version_entry = app.get_tag(tag, file)
+            print(version_entry.get("version"))
+            print("\n".join(f"- {c}" for c in version_entry["changes"]))
         case "check-format":
             serdes.load(file)
             print("Changelog format validation was successful.")

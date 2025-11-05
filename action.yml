@@ -7,60 +7,101 @@ inputs:
     description: "Python version to use with uv"
     required: false
     default: "3.12"
-  working-directory:
-    description: "Directory where the command will be executed"
+  file-path:
+    description: "Path to the changelog file to process"
     required: false
-    default: "."
-  format-check:
+    default: "./CHANGELOG.txt"
+  check-format:
     description: "Whether to run the check-format step (boolean)"
     required: false
     default: "true"
-  tag-check:
-    description: "Tag to verify"
+  get-tag:
+    description: "Use 'from-push' for push tag or specify a ref manually."
     required: false
     default: ""
   summarize-news:
-    description: "Origin and target file paths separated by a space"
+    description: >
+      Use 'from-pr' for PRs, or provide ["<file_path>","<target_branch>"].
     required: false
     default: ""
 
 runs:
   using: "composite"
   steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Setup uv
       uses: astral-sh/setup-uv@v5
       with:
         python-version: "${{ inputs.python-version }}"
+
     - id: format
       name: Check format
-      if: ${{ fromJSON(inputs.format-check) }}
+      if: ${{ fromJSON(inputs.check-format) }}
       shell: bash
       run: |
-        set -euo pipefail
         echo "Checking format..."
         uv run --with '${{ github.action_path }}' \
           changelogtxt check-format \
-          -f ${{ inputs.working-directory }}
-    - id: tag
-      name: Check tag
-      if: ${{ inputs.tag-check != '' }}
+          -f ${{ inputs.file-path }}
+
+    - id: tag-push
+      name: Get pushed tag
+      env:
+        IS_PUSH: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+      if: ${{ inputs.get-tag == 'from-push' && env.IS_PUSH == 'true' }}
       shell: bash
       run: |
-        set -euo pipefail
         echo "Checking tag..."
-        uv run --with '${{ github.action_path }}' \
-          changelogtxt check-tag ${{ inputs.tag-check }} \
-          -f ${{ inputs.working-directory }}
-    - id: summarize
-      name: Summarize News
-      if: ${{ inputs.summarize-news != '' }}
-      working-directory: ${{ inputs.working-directory }}
+        uv run --with "${{ github.action_path }}" \
+          changelogtxt get-tag "${{ github.ref_name }}" \
+          -f "${{ inputs.file-path }}"
+
+    - id: tag
+      name: Get tag
+      if: ${{ inputs.get-tag != '' && inputs.get-tag != 'from-push' }}
+      shell: bash
+      run: |
+        echo "Checking tag..."
+        uv run --with "${{ github.action_path }}" \
+          changelogtxt get-tag "${{ inputs.get-tag }}" \
+          -f ${{ inputs.file-path }}
+
+    - id: summarize-push
+      name: Summarize news from push
+      env:
+        IS_PR: ${{ github.event_name == 'pull_request' }}
+        FILE_PATH: ${{ inputs.file-path }}
+      if: ${{ inputs.summarize-news == 'from-pr' && env.IS_PR == 'true' }}
       shell: bash
       run: |
         set -euo pipefail
-        echo "Summarizing news..."
-        read origin target <<< "${{ inputs.summarize-news }}"
-        echo "Origin: $origin"
-        echo "Target: $target"
+        echo "Checking files"
+        HEAD_BRANCH=${{ github.event.pull_request.head.ref }}
+        BASE_BRANCH=${{ github.event.pull_request.base.ref }}
+
+        git show "origin/$BASE_BRANCH:$FILE_PATH" > origin.txt
+        git show "origin/$HEAD_BRANCH:$FILE_PATH" > target.txt
+
         uv run --with '${{ github.action_path }}' \
-          changelogtxt summarize-news "$origin" "$target"
+          changelogtxt summarize-news origin.txt target.txt
+
+    - id: summarize
+      name: Summarize news
+      env:
+        SUMMARIZE: ${{ inputs.summarize-news }}
+      if: ${{ env.SUMMARIZE != '' && env.SUMMARIZE != 'from-pr' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "Checking files"
+
+        FILE_PATH=$(echo "$SUMMARIZE" | jq -r '.[0]')
+        TARGET_BRANCH=$(echo "$SUMMARIZE" | jq -r '.[1]')
+
+        git show "origin/$TARGET_BRANCH:$FILE_PATH" > target.txt
+
+        uv run --with '${{ github.action_path }}' \
+          changelogtxt summarize-news "$FILE_PATH" target.txt

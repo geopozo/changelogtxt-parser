@@ -39,10 +39,10 @@ def update(
     else:
         new_version = version
 
-    entries = serdes.load(file_path)
+    entries: list[version_tools.VersionEntry] = serdes.load(file_path)
 
     if not entries:
-        entries: list[version_tools.VersionEntry] = [{"version": "", "changes": []}]
+        entries = [{"version": "", "changes": []}]
 
     for entry in entries:
         if new_version.removeprefix("v") == entry["version"].removeprefix("v"):
@@ -66,9 +66,9 @@ def update(
     serdes.dump(entries, file_path)
 
 
-def check_tag(tag: str, file_path: str) -> None:
+def get_tag(tag: str, file_path: str) -> version_tools.VersionEntry:
     """
-    Validate whether a given version tag exists in the changelog file.
+    Return a VersionEntry from the tag in the changelog file.
 
     Args:
         tag: The version tag to validate (e.g., "1.2.3" or "v1.2.3").
@@ -80,10 +80,11 @@ def check_tag(tag: str, file_path: str) -> None:
     """
     entries = serdes.load(file_path)
     target_ver = version_tools.parse_version(tag)
+
     for entry in entries:
         current_ver = version_tools.parse_version(entry["version"])
         if current_ver == target_ver:
-            return
+            return entry
     raise ValueError(f"Tag '{tag}' not found in changelog.")
 
 

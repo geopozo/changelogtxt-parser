@@ -9,79 +9,77 @@
 
 ## Overview
 
-Changelogtxt-parser is a lightweight Python utility designed to help you manage changelog files. It offers a command-line interface (CLI) that can:
+Changelogtxt-parser is a python api, CLI, and github action for parsing and verifying a changelog.txt like this:
 
-- Check if a tag exists.
-- Check the changelog format.
-- Compare two changelog files.
-- Add a new tag.
-- Add a new unreleased entry.
+```txt
+- An unreleased change
 
-## Installation
+v0.2.0
+- A change
 
-You can use Changelogtxt-parser in two ways:
-
-1. Install in your project:
-
-<div class="termy">
-
-```console
-uv add git+https://github.com/geopozo/changelogtxt-parser
+v0.1.0
+- A change
+- Another change
 ```
 
-</div>
+### How to Install
 
-After installation, verify that it’s working by running:
-
-<div class="termy">
-
-```console
-uv run changelogtxt --help
+```shell
+$ uv add git+https://github.com/geopozo/changelogtxt-parser
+# or
+$ pip install git+https://github.com/geopozo/changelogtxt-parser
 ```
 
-</div>
+## Python API
 
-2. From source using uvx (recommended for latest version):
-
-<div class="termy">
-
-```console
-uvx --from git+https://github.com/geopozo/changelogtxt-parser changelogtxt --help
+```python
+import changelogtxt
+x = changelogtxt.load(filename)
+# ejemplo objeto
+changelogtxt.dump(object)
 ```
 
-</div>
+## CLI Examples
 
-## Using Changelogtxt-parser
+```shell
+# lint
+$ changelogtxt check-format
 
-<div class="termy">
+# verify version exists
+$ changelogtxt get-tag v1.0.1
 
-```console
-usage: changelogtxt [-h] [--logistro-human]
-[--logistro-structured] [--logistro-level LOG]
-{check-tag,check-format,summarize-news,update} ...
+# add new change or version
+$ changelogtxt update -t "v1.0.2" -m "Change"
 
-changelogtxt helps you manage your changelog file.
-changelogtxt COMMAND --help for information about commands.
-
-positional arguments:
-  {check-tag,check-format,summarize-news,update}
-    check-tag           Checks if a tag in the changelog
-                        matches the specified tag.
-    check-format        Check changelog format.
-    summarize-news      Compare source file with target file.
-    update              Creates a new version entry if it
-                        doesn't exist.
-
-options:
-  -h, --help            show this help message and exit
-  --logistro-human      Format the logs for humans
-  --logistro-structured
-                        Format the logs as JSON
-  --logistro-level LOG  Set the logging level (no default,
-                        fallback to system default)
+# compare two git ref files
+$ changelogtxt summarize-news <origin> <target>
 ```
 
-</div>
+## Basic action
+
+```yaml
+- name: Check changelog
+  uses: geopozo/changelogtxt-parser@main
+  with:
+    # Python version to use (default: 3.12)
+    python-version: ""
+
+    # Path to the changelog file (default: searches ./CHANGELOG.txt)
+    file-path: ""
+
+    # Whether to validate the changelog format (default: "true")
+    check-format: "true"
+
+    # Tag to verify. Use "from-push" to get the tag from the latest push
+    get-tag: "v1.0.0"
+
+    # Compare changelog files from the current ref to <target_ref> (branch, commit hash, or tag)
+    # <file_path> is relative to the `working-directory`
+    summarize-news: '["<file_path>", "<target_ref>"]'
+```
+
+More info:
+[docs/action.md](docs/action.md)
 
 ## License
 
