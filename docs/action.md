@@ -3,8 +3,17 @@
 # Setup action
 
 ```yaml
-name: Check Changelog
+on:
+  push:
+    tags:
+      - "*"
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - main
 
+name: Check Changelog
 jobs:
   changelog:
     runs-on: ubuntu-latest
