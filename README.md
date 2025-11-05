@@ -78,7 +78,7 @@ $ changelogtxt summarize-news <origin> <target>
 ```
 
 More info:
-[[docs/action.md]]
+[docs/action.md](docs/action.md)
 
 ## License
 
