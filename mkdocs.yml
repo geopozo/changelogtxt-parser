@@ -18,6 +18,7 @@ nav:
 
 theme:
   name: material
+  favicon: media/favicon.png
   features:
     - content.code.copy
   palette:
