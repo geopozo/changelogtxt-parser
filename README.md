@@ -36,7 +36,7 @@ $ pip install git+https://github.com/geopozo/changelogtxt-parser
 ```python
 import changelogtxt
 x = changelogtxt.load(filename)
-# ejemplo objeto
+# object example
 changelogtxt.dump(object)
 ```
 
