@@ -41,6 +41,10 @@ dev = [
   "pytest-xdist>=3.8.0",
 ]
 
+docs = [
+  "mkquixote @ git+ssh://git@github.com/geopozo/mkquixote; python_version >= '3.11'",
+]
+
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
