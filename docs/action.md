@@ -1,5 +1,3 @@
-[Go back](../README.md)
-
 # Setup action
 
 ```yaml

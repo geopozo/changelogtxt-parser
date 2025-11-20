@@ -78,9 +78,6 @@ $ changelogtxt summarize-news <origin> <target>
     summarize-news: '["<file_path>", "<target_ref>"]'
 ```
 
-More info:
-[docs/action.md](docs/action.md)
-
 ## License
 
 This project is licensed under the terms of the MIT license.
