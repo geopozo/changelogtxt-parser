@@ -2,7 +2,8 @@
 
 <h1 align="center">
 	<img
-        height="250"
+    height="250"
+    width="250"
 		alt="changelogtxt_small"
 		src="docs/media/logo.png">
 </h1>
