@@ -12,9 +12,7 @@
 
 Changelogtxt-parser is a python api, CLI, and github action for parsing and verifying a changelog.txt like this:
 
-=== "CHANGELOG.txt"
-
-```txt
+```txt title="CHANGELOG.txt"
 - An unreleased change
 
 v0.2.0
@@ -27,9 +25,7 @@ v0.1.0
 
 ## How to Install
 
-=== "Console"
-
-```shell
+```shell title="Console"
 $ uv add git+https://github.com/geopozo/changelogtxt-parser
 # or
 $ pip install git+https://github.com/geopozo/changelogtxt-parser
@@ -37,9 +33,7 @@ $ pip install git+https://github.com/geopozo/changelogtxt-parser
 
 ## Python API
 
-=== "Python"
-
-```python
+```python title="Python"
 import changelogtxt
 
 x = changelogtxt.load(filename)
@@ -50,9 +44,7 @@ changelogtxt.dump(object)
 
 ## CLI Examples
 
-=== "Console"
-
-```shell
+```shell title="Console"
 # lint
 $ changelogtxt check-format
 
@@ -68,9 +60,7 @@ $ changelogtxt summarize-news <origin> <target>
 
 ## Basic action
 
-=== "action.yml"
-
-```yaml
+```yaml title="action.yml"
 - name: Check changelog
   uses: geopozo/changelogtxt-parser@main
   with:
