@@ -1,0 +1,9 @@
+:root > * {
+  --md-primary-fg-color: #ee0f0f;
+  --md-primary-fg-color--light: #ecb7b7;
+  --md-primary-fg-color--dark: #90030c;
+}
+
+.highlight .filename {
+  background-color: var(--md-code-bg-color) !important;
+}
