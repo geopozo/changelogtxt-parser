@@ -8,6 +8,12 @@
   background-color: var(--md-code-bg-color) !important;
 }
 
-.long-description .text, .long-description.text {
-  color: var(--md-default-fg-color--light) !important;
+.text,
+.code.key {
+  color: var(--md-default-fg-color) !important;
+}
+
+.h7,
+.code.key {
+  font-weight: bold !important;
 }
