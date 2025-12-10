@@ -7,3 +7,7 @@
 .highlight .filename {
   background-color: var(--md-code-bg-color) !important;
 }
+
+.long-description .text, .long-description.text {
+  color: var(--md-default-fg-color--light) !important;
+}
