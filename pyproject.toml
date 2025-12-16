@@ -19,11 +19,7 @@ authors = [
   { name = "David Angarita", email = "davidangarita.sistemas@gmail.com" },
 ]
 maintainers = [{ name = "Andrew Pikul", email = "ajpikul@gmail.com" }]
-dependencies = [
-  "logistro>=1.1.0",
-  "packaging>=25.0",
-  "semver>=3.0.4",
-]
+dependencies = ["logistro>=1.1.0", "packaging>=25.0", "semver>=3.0.4"]
 
 [project.urls]
 Homepage = "https://github.com/geopozo/changelogtxt-parser"
@@ -41,9 +37,6 @@ dev = [
   "pytest-xdist>=3.8.0",
 ]
 
-docs = [
-  "mkquixote @ git+ssh://git@github.com/geopozo/mkquixote; python_version >= '3.11'",
-]
 
 [tool.ruff.lint]
 select = ["ALL"]
