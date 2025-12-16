@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from hypothesis import HealthCheck, assume, given, settings
 
@@ -90,7 +92,10 @@ class TestUpdate:
     def test_update_existing_version_raises_error(self, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
-        with pytest.raises(RuntimeError, match="Cannot overwrite an existing version."):
+        with pytest.raises(
+            RuntimeError,
+            match=re.escape("Cannot overwrite an existing version."),
+        ):
             app.update("v1.0.1", "New change", file)
 
     def test_update_existing_version_with_force_allows_update(
@@ -141,7 +146,10 @@ class TestUpdate:
     def test_update_version_missing_message(self, tmp_path):
         file = tmp_path / DEFAULT_FILE
         file.write_text(CHANGELOG_CONTENT)
-        with pytest.raises(ValueError, match="Version already exists: Nothing to do."):
+        with pytest.raises(
+            ValueError,
+            match=re.escape("Version already exists: Nothing to do."),
+        ):
             app.update("v1.0.1", "", file, force=True)
 
 
