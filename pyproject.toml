@@ -75,3 +75,11 @@ omit = ["src/changelogtxt_parser/_cli.py"]
 
 [tool.mypy]
 files = ["src/changelogtxt_parser"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+include = ["src", "tests"]
+
+[tool.rumdl]
+disable = ["MD046"]
