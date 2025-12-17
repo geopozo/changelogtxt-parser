@@ -19,11 +19,7 @@ authors = [
   { name = "David Angarita", email = "davidangarita.sistemas@gmail.com" },
 ]
 maintainers = [{ name = "Andrew Pikul", email = "ajpikul@gmail.com" }]
-dependencies = [
-  "logistro>=1.1.0",
-  "packaging>=25.0",
-  "semver>=3.0.4",
-]
+dependencies = ["logistro>=1.1.0", "packaging>=25.0", "semver>=3.0.4"]
 
 [project.urls]
 Homepage = "https://github.com/geopozo/changelogtxt-parser"
@@ -40,6 +36,7 @@ dev = [
   "pytest-cov>=7.0.0",
   "pytest-xdist>=3.8.0",
 ]
+
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -78,3 +75,11 @@ omit = ["src/changelogtxt_parser/_cli.py"]
 
 [tool.mypy]
 files = ["src/changelogtxt_parser"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+include = ["src", "tests"]
+
+[tool.rumdl]
+disable = ["MD046"]

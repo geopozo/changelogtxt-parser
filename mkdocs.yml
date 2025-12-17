@@ -1,0 +1,61 @@
+---
+site_name: changelogtxt-parser
+repo_name: github
+
+docs_dir: "docs/"
+nav:
+  - Home: >-
+      {
+        "dest": "README.md",
+        "src": "../README.md",
+        "replace": {"src=\"docs/": "src=\""}
+      }
+  - Action: '{"dest": "action.md", "src": "action.md"}'
+  - Reference: >-
+      {
+        "api": "changelogtxt_parser"
+      }
+
+theme:
+  name: material
+  logo: media/logo.png
+  favicon: media/favicon.png
+  features:
+    - content.code.copy
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  language: en
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+plugins:
+  - quimeta
+  - quicopy
+  - quiapi
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/geopozo/changelogtxt-parser
+  generator: false
+
+copyright: Copyright &copy; 2025 Geopozo
