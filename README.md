@@ -29,9 +29,9 @@ v0.1.0
 ## How to Install
 
 ```shell title="Console"
-uv add git+https://github.com/geopozo/changelogtxt-parser
+uv add changelogtxt-parser
 # or
-pip install git+https://github.com/geopozo/changelogtxt-parser
+pip install changelogtxt-parser
 ```
 
 ## Python API
