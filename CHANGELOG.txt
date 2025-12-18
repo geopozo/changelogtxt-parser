@@ -1,2 +1,5 @@
-v0.1.0
+v1.0.0rc1
+- Update readme install commands.
+
+v1.0.0rc0
 - Add `get_tag` function replacing `check_tag` function
