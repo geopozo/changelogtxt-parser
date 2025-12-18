@@ -48,7 +48,10 @@ jobs:
   store-build:
     name: build release
     needs: super-test
-    if: always() && !cancelled() && !failure()
+    if: ${{ !cancelled() &&
+      !failure() &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1 }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -73,7 +76,10 @@ jobs:
     needs:
       - super-test
       - store-build
-    if: always() && !cancelled() && !failure()
+    if: ${{ !cancelled() &&
+      !failure() &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1 }}
     runs-on: ubuntu-latest
 
     permissions:
@@ -117,7 +123,10 @@ jobs:
       - super-test
       - store-build
       - github-release
-    if: always() && !cancelled() && !failure()
+    if: ${{ !cancelled() &&
+      !failure() &&
+      github.event_name == 'push' &&
+      github.run_attempt == 1 }}
     runs-on: ubuntu-latest
     environment:
       name: pypi
