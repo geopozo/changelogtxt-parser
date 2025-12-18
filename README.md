@@ -7,7 +7,7 @@
         height="250"
         width="250"
         alt="changelogtxt_small"
-        src="docs/media/logo.png">
+        src="https://raw.githubusercontent.com/geopozo/changelogtxt-parser/main/docs/media/logo.png">
 </h1>
 
 ## Overview
